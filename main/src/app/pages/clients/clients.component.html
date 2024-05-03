@@ -1,0 +1,272 @@
+<div class="row">
+  <!-- Content wrapper -->
+  <div class="content-wrapper">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h4 class="py-3 mb-4">
+        <span class="text-muted fw-light">Client /</span> List
+      </h4>
+
+      <!-- Client List Widget -->
+      <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between">
+                <div class="content-left">
+                  <span>Session</span>
+                  <div class="d-flex align-items-end mt-2">
+                    <h4 class="mb-0 me-2">21,459</h4>
+                    <small class="text-success">(+29%)</small>
+                  </div>
+                  <p class="mb-0">Total Users</p>
+                </div>
+                <div class="avatar">
+                  <span class="avatar-initial rounded bg-label-primary">
+                    <i class="bx bx-user bx-sm"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between">
+                <div class="content-left">
+                  <span>Paid Users</span>
+                  <div class="d-flex align-items-end mt-2">
+                    <h4 class="mb-0 me-2">4,567</h4>
+                    <small class="text-success">(+18%)</small>
+                  </div>
+                  <p class="mb-0">Last week analytics </p>
+                </div>
+                <div class="avatar">
+                  <span class="avatar-initial rounded bg-label-danger">
+                    <i class="bx bx-user-check bx-sm"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between">
+                <div class="content-left">
+                  <span>Active Users</span>
+                  <div class="d-flex align-items-end mt-2">
+                    <h4 class="mb-0 me-2">19,860</h4>
+                    <small class="text-danger">(-14%)</small>
+                  </div>
+                  <p class="mb-0">Last week analytics</p>
+                </div>
+                <div class="avatar">
+                  <span class="avatar-initial rounded bg-label-success">
+                    <i class="bx bx-group bx-sm"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between">
+                <div class="content-left">
+                  <span>Pending Users</span>
+                  <div class="d-flex align-items-end mt-2">
+                    <h4 class="mb-0 me-2">237</h4>
+                    <small class="text-success">(+42%)</small>
+                  </div>
+                  <p class="mb-0">Last week analytics</p>
+                </div>
+                <div class="avatar">
+                  <span class="avatar-initial rounded bg-label-warning">
+                    <i class="bx bx-user-voice bx-sm"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-header border-bottom">
+        <h5 class="card-title">Search Filter</h5>
+        <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+          <div class="col-md-4 user_role"><select id="UserRole" class="form-select text-capitalize">
+              <option value=""> Select Role </option>
+              <option value="Admin">Admin</option>
+              <option value="Author">Author</option>
+              <option value="Editor">Editor</option>
+              <option value="Maintainer">Maintainer</option>
+              <option value="Subscriber">Subscriber</option>
+            </select></div>
+          <div class="col-md-4 user_plan"><select id="UserPlan" class="form-select text-capitalize">
+              <option value=""> Select Plan </option>
+              <option value="Basic">Basic</option>
+              <option value="Company">Company</option>
+              <option value="Enterprise">Enterprise</option>
+              <option value="Team">Team</option>
+            </select></div>
+          <div class="col-md-4 user_status"><select id="FilterTransaction" class="form-select text-capitalize">
+              <option value=""> Select Status </option>
+              <option value="Pending" class="text-capitalize">Pending</option>
+              <option value="Active" class="text-capitalize">Active</option>
+              <option value="Inactive" class="text-capitalize">Inactive</option>
+            </select></div>
+        </div>
+      </div>
+
+      <!-- Client List Table -->
+      <div class="card">
+        <div class="table-responsive ">
+          <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="row mx-1">
+              <div
+                class="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+                <div class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start mt-md-0 mt-3">
+                  <div class="dt-buttons btn-group flex-wrap">
+                    <a class="btn btn-secondary btn-primary" [routerLink]="['/clients/formulaire-client']" tabindex="0"
+                      aria-controls="" type="button">
+                      <span><i class="bx bx-plus me-md-1"></i><span class="d-md-inline-block d-none">Ajouter un
+                          client</span></span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-3">
+
+                <div
+                  class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0">
+                  <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                    <label>
+                      <input type="search" class="form-control" placeholder="Rechercher.."
+                        aria-controls="DataTables_Table_0" [(ngModel)]="searchQuery" (keyup.enter)="search()">
+                    </label>
+                    <button class="btn btn-primary" type="button" (click)="search()">Rechercher</button>
+                  </div>
+                  <div class="dt-buttons btn-group flex-wrap">
+                    <div class="btn-group">
+                      <button class="btn buttons-collection dropdown-toggle btn-label-secondary mx-3" tabindex="0"
+                        aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog"
+                        aria-expanded="false"><span><i class="bx bx-export me-1"></i>Export</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Tableau des clients -->
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+              <div class="row mx-2">
+                <div class="col-md-10">
+                  <table class="user-list-table table border-top dataTable no-footer dtr-column" id="DataTables_Table_1"
+                    aria-describedby="DataTables_Table_0_info" style="width: auto;">
+                    <thead>
+                      <tr>
+                        <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                          aria-label="Nom et prénom: activate to sort column ascending">Nom et prénom</th>
+                        <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                          aria-label="Type: activate to sort column ascending">Type</th>
+                        <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                          aria-label="Téléphone: activate to sort column ascending">Téléphone</th>
+                        <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                          aria-label="Email: activate to sort column ascending">Email</th>
+                        <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                          aria-label="Société: activate to sort column ascending">Société</th>
+                        <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                          aria-label="Login: activate to sort column ascending">Login</th>
+                        <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                          aria-label="Expiration: activate to sort column ascending">Expiration</th>
+                        <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                          aria-label="Fonction: activate to sort column ascending">Fonction</th>
+                        <th class=" sorting_disabled" rowspan="1" colspan="1" style="width: 76px;" aria-label="Actions">
+                          Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Résultats de la recherche -->
+                      <ng-container *ngIf="searchPerformed">
+                        <ng-container *ngIf="searchResults.length > 0; else noResults">
+                          <tr *ngFor="let client of searchResults">
+                            <td>{{ client.nom }} {{ client.prenom }}</td>
+                            <td>{{ client.typeclient?.NomType || '-' }}</td>
+                            <td>{{ client.fixePerso || client.fixePro || '-' }}</td>
+                            <td>{{ client.mailPerso || client.mailPro || '-' }}</td>
+                            <td>{{ client.societe?.nom || '-' }}</td>
+                            <td>{{ client.login }}</td>
+                            <td>{{ client.expiration | date: 'mediumDate' }}</td>
+                            <td>{{ client.fonction || '-' }}</td>
+                            <td>
+                              <div class="d-inline-block text-nowrap">
+                                <button class="btn btn-sm btn-icon"><i class="bx bx-edit"></i></button>
+                                <button class="btn btn-sm btn-icon delete-record"><i class="bx bx-trash"></i></button>
+                                <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                  <i class="bx bx-dots-vertical-rounded me-2"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                  <a href="app-user-view-account.html" class="dropdown-item">View</a>
+                                  <a href="javascript:;" class="dropdown-item">Suspend</a>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </ng-container>
+                      </ng-container>
+
+                      <!-- Afficher un message si aucun résultat n'est trouvé -->
+                      <ng-template #noResults>
+                        <tr>
+                          <td colspan="9">Aucun élément trouvé</td>
+                        </tr>
+                      </ng-template>
+
+                      <!-- Clients normaux -->
+                      <ng-container *ngIf="!searchPerformed">
+                        <tr *ngFor="let client of clients$ | async">
+                          <td>{{ client.nom }} {{ client.prenom }}</td>
+                          <td>{{ client.typeclient?.NomType || '-' }}</td>
+                          <td>{{ client.fixePerso || client.fixePro || '-' }}</td>
+                          <td>{{ client.mailPerso || client.mailPro || '-' }}</td>
+                          <td>{{ client.societe?.nom || '-' }}</td>
+                          <td>{{ client.login }}</td>
+                          <td>{{ client.expiration | date: 'mediumDate' }}</td>
+                          <td>{{ client.fonction || '-' }}</td>
+                          <td>
+                            <div class="d-inline-block text-nowrap">
+                              <button class="btn btn-sm btn-icon"><i class="bx bx-edit"></i></button>
+                              <button class="btn btn-sm btn-icon delete-record"><i class="bx bx-trash"></i></button>
+                              <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                <i class="bx bx-dots-vertical-rounded me-2"></i>
+                              </button>
+                              <div class="dropdown-menu dropdown-menu-end m-0">
+                                <a href="app-user-view-account.html" class="dropdown-item">View</a>
+                                <a href="javascript:;" class="dropdown-item">Suspend</a>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </ng-container>
+                    </tbody>
+
+
+                  </table>
+                  <mat-paginator [length]="totalClients" [pageSize]="itemsPerPage" [pageSizeOptions]="[1,5, 10, 20]"
+                    [showFirstLastButtons]="true" (page)="onPageChange($event)">
+                  </mat-paginator>
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

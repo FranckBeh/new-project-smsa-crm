@@ -1,0 +1,167 @@
+<div class="row">
+  <div class="card mb-4">
+    <h5 class="card-header">Formulaire Client - Étape {{ currentStep }}</h5>
+    <form class="card-body" [formGroup]="clientForm" (ngSubmit)="onSubmit()">
+      <div *ngIf="currentStep == 1">
+        <h6>1. Account Details</h6>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Nom</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="nom" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Prénom</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="prenom" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Type</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="type" type="number" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <div class="form-password-toggle">
+              <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Login</mat-label>
+              <mat-form-field appearance="outline" class="w-100" color="primary">
+                <input matInput formControlName="login" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Société</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="societe" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Fonction</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="fonction" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Expiration</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="expiration" [matDatepicker]="picker" />
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="currentStep == 2">
+        <hr class="my-4 mx-n4">
+        <h6>2. Personal Info</h6>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Fixe Personnel</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="fixePerso" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Fixe Professionnel</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="fixePro" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Email Personnel</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="mailPerso" type="email" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Email Professionnel</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput formControlName="mailPro" type="email" />
+            </mat-form-field>
+          </div>
+          <!-- Ajoutez ici d'autres champs pour l'étape 2 -->
+        </div>
+      </div>
+      <div *ngIf="currentStep == 3">
+        <hr class="my-4 mx-n4">
+        <h6>3. Conjoints Info</h6>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Nom du conjoint</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">GSM Professionnel du conjoint</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput />
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Email du conjoint</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput type="email" />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">GSM Personnel du conjoint</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput />
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Date d'anniversaire du conjoint</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput [matDatepicker]="picker" />
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+
+        </div>
+
+      </div>
+      <div *ngIf="currentStep === 4">
+        <!-- Étape 4 : Informations sur les enfants -->
+        <h6>4. Enfants Info</h6>
+        <!-- Informations sur les enfants -->
+        <div *ngFor="let enfant of enfants.controls; let i=index" class="child-info d-flex border rounded position-relative pe-0 mb-2">
+          <div class="row w-100 m-0 p-3">
+            <div class="col-md-6">
+              <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-2 d-block text-center text-md-start">Nom de l'enfant</mat-label>
+              <mat-form-field appearance="outline" class="w-100" color="primary">
+                <input matInput formControlName="nom" />
+              </mat-form-field>
+            </div>
+            <div class="col-md-5">
+              <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-2 d-block text-center text-md-start">Date de naissance de l'enfant</mat-label>
+              <mat-form-field appearance="outline" class="w-100" color="primary">
+                <input matInput [matDatepicker]="picker" formControlName="dateNaissance" />
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="col-md-1 d-flex align-items-center justify-content-center justify-content-md-start">
+              <i class="bx bx-x fs-4 text-muted cursor-pointer" (click)="removeChild(i)"></i>
+            </div>
+          </div>
+
+          <!-- Bouton pour supprimer cet enfant -->
+        </div>
+
+        <!-- Bouton pour ajouter un nouvel enfant -->
+        <button type="button" class="btn btn-success mt-3" (click)="addChild()">Ajouter un enfant</button>
+        </div>
+      <div class="pt-4">
+        <button type="button" class="btn btn-secondary me-sm-3 me-1" (click)="prevStep()" [disabled]="currentStep === 1">Précédent</button>
+        <button type="button" class="btn btn-primary me-sm-3 me-1" (click)="nextStep()" [disabled]="currentStep === totalSteps || isStepValid(currentStep)">Suivant</button>
+        <button type="submit" class="btn btn-primary" *ngIf="currentStep === totalSteps">Soumettre</button>
+      </div>
+    </form>
+  </div>
+</div>

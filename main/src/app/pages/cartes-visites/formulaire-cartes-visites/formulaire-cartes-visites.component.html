@@ -1,0 +1,79 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title m-3 p-2">Modifier la carte</h5>
+      <button type="button" class="close m-3" data-dismiss="modal" aria-label="Close" (click)="onNoClick()">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="form-group row m-1">
+          <label for="nom" class="col-sm-2 col-form-label">Nom</label>
+          <div class="col-sm-10 col-md-12">
+            <input type="text" class="form-control" id="nom" placeholder="Nom" [(ngModel)]="data.nom" name="nom">
+          </div>
+        </div>
+
+        <div class="form-group row m-1">
+          <div class="col-sm-10 col-md-6 ">
+            <label for="societe" class="col-sm-2 col-form-label">Société</label>
+            <input type="text" class="form-control" id="societe" placeholder="Société" [(ngModel)]="data.societe" name="societe">
+          </div>
+
+          <div class="col-sm-10 col-md-6">
+            <label for="fonction" class="col-sm-2 col-form-label">Fonction</label>
+            <input type="text" class="form-control" id="fonction" placeholder="Fonction" [(ngModel)]="data.fonction" name="fonction">
+          </div>
+        </div>
+
+        <div class="form-group row m-1">
+          <div class="col-sm-10 col-md-6">
+            <label for="adresse" class="col-sm-2 col-form-label">Adresse</label>
+            <input type="text" class="form-control" id="adresse" placeholder="Adresse" [(ngModel)]="data.adresse" name="adresse">
+          </div>
+
+          <div class="col-sm-10 col-md-6">
+            <label for="tel" class="col-sm-2 col-form-label">Téléphone</label>
+            <input type="text" class="form-control" id="tel" placeholder="Téléphone" [(ngModel)]="data.tel" name="tel">
+          </div>
+        </div>
+
+        <div class="form-group row m-1">
+          <div class="col-sm-10 col-md-6">
+            <label for="gsm" class="col-sm-2 col-form-label">GSM</label>
+            <input type="text" class="form-control" id="gsm" placeholder="GSM" [(ngModel)]="data.gsm" name="gsm">
+          </div>
+
+          <div class="col-sm-10 col-md-6">
+            <label for="fax" class="col-sm-2 col-form-label">Fix</label>
+            <input type="text" class="form-control" id="fax" placeholder="Fix" [(ngModel)]="data.fax" name="fax">
+          </div>
+        </div>
+
+        <div class="form-group row m-1">
+          <div class="col-sm-10 col-md-6">
+            <label for="email" class="col-sm-2 col-form-label">Email</label>
+            <input type="email" class="form-control" id="email" placeholder="Email" [(ngModel)]="data.email" name="email">
+          </div>
+
+          <div class="col-sm-10 col-md-6">
+            <label for="web" class="col-sm-2 col-form-label">Web</label>
+            <input type="text" class="form-control" id="web" placeholder="Web" [(ngModel)]="data.web" name="web">
+          </div>
+        </div>
+
+        <div class="form-group row m-1">
+          <label for="remarques" class="col-sm-2 col-form-label">Remarques</label>
+          <div class="col-sm-10 col-md-12">
+            <textarea class="form-control" id="remarques" rows="2" placeholder="Remarques" [(ngModel)]="data.remarques" name="remarques"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer m-1">
+      <button type="button" class="btn btn-secondary mx-2" data-dismiss="modal" (click)="onNoClick()">Annuler</button>
+      <button type="button" class="btn btn-primary " (click)="saveDialog()">Enregistrer</button>
+    </div>
+  </div>
+</div>

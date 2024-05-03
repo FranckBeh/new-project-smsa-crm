@@ -1,0 +1,26 @@
+<mat-dialog-content [formGroup]="societeForm">
+  <mat-form-field appearance="fill">
+    <mat-label>ID Société</mat-label>
+    <input matInput formControlName="idSociete">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Nom</mat-label>
+    <input matInput formControlName="nom">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>ICE</mat-label>
+    <input matInput formControlName="ice">
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Adresse</mat-label>
+    <input matInput formControlName="adresse">
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="onCancel()">Annuler</button>
+  <button mat-button (click)="onSubmit()" [disabled]="!societeForm.valid">Soumettre</button>
+</mat-dialog-actions>

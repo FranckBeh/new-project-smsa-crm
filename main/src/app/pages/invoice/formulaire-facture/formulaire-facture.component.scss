@@ -1,0 +1,14 @@
+.autocomplete-list {
+  max-height: 100px; // Définir la hauteur maximale de la liste
+  overflow-y: auto; // Activer le défilement vertical lorsque la liste dépasse la hauteur maximale
+}
+
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}

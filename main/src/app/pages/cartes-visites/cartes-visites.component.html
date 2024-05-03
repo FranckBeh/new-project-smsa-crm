@@ -1,0 +1,82 @@
+<div class="container mt-3">
+  <h2 class="text-center mb-4">Cartes de Visite</h2>
+  <p class="text-muted text-center">Voici toutes les cartes de visite :</p>
+  <div class=" m-3">
+    <div class="row">
+      <div class="col-md-6 ">
+        <input #searchInput type="text" class="form-control w-100" placeholder="Rechercher..."
+          (input)="onSearch(searchInput.value)" />
+      </div>
+      <div class="col-md-3 ">
+        <button class="btn btn-primary ml-2" (click)="openDialog(null)"> <i class="fa fa-address-card" aria-hidden="true"></i> Ajouter une nouvelle carte</button>
+      </div>
+      <div class="col-md-3 ">
+        <select class="form-control ml-2" [(ngModel)]="exportType">
+          <option value="csv">Exporter en CSV</option>
+          <option value="excel">Exporter en Excel</option>
+        </select>
+        <button class="btn btn-secondary ml-2" (click)="exportData()"> <i class="fa fa-download" aria-hidden="true"></i> Exporter</button>
+
+      </div>
+
+    </div>
+  </div>
+
+
+    <div>
+      <div class="row" *ngIf="searchResults.length === 0">
+        <div class="row">
+          <div class="col-md-4 mb-4" *ngFor="let carteVisite of carteVisites">
+
+            <div class="card shadow h-100">
+              <img class="card-img-top " [src]="carteVisite.logo" alt="Logo de la société"
+                style="width:100%; object-fit: contain; height: 200px;">
+              <div class="card-body">
+                <h4 class="card-title">{{ carteVisite.nom }}</h4>
+                <h5 class="card-text"><strong>Société :</strong> {{ carteVisite.societe || 'n/a' }}</h5>
+                <p class="card-text"><strong>Fonction :</strong> {{ carteVisite.fonction ||'n/a' }}</p>
+                <p class="card-text"><strong>Adresse :</strong> {{ carteVisite.adresse || 'n/a'}}</p>
+                <p class="card-text"><strong>Téléphone :</strong> {{ carteVisite.tel || 'n/a' }}</p>
+                <p class="card-text"><strong>GSM :</strong> {{ carteVisite.gsm || 'n/a'}}</p>
+                <p class="card-text"><strong>Fix :</strong> {{ carteVisite.fax || 'n/a' }}</p>
+                <p class="card-text"><strong>Email :</strong> {{ carteVisite.email|| 'n/a' }}</p>
+                <p class="card-text"><strong>Web :</strong> {{ carteVisite.web || 'n/a'}}</p>
+                <p class="card-text"><strong>Remarques :</strong> {{ carteVisite.remarques || 'n/a'}}</p>
+                <button class="btn btn-primary mt-3" (click)="openDialog(carteVisite)">Modifier</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="carteVisites.length === 0" class="alert alert-info">
+          Aucun résultat trouvé
+        </div>
+
+      </div>
+    </div>
+
+
+    <div *ngIf="searchResults.length > 0">
+      <h3 class="text-center mb-3">Résultats de la recherche</h3>
+      <div class="row">
+        <div class="col-md-4 mb-4" *ngFor="let carteVisite of searchResults">
+
+          <div class="card shadow h-100">
+            <img class="card-img-top" [src]="carteVisite.logo" alt="Logo de la société"
+              style="width:100%; object-fit: contain; height: 200px;">
+            <div class="card-body">
+              <h4 class="card-title">{{ carteVisite.nom }}</h4>
+              <h5 class="card-text"><strong>Société :</strong> {{ carteVisite.societe || 'n/a' }}</h5>
+              <p class="card-text"><strong>Fonction :</strong> {{ carteVisite.fonction || 'n/a' }}</p>
+              <p class="card-text"><strong>Adresse :</strong> {{ carteVisite.adresse || 'n/a'}}</p>
+              <p class="card-text"><strong>Téléphone :</strong> {{ carteVisite.tel || 'n/a' }}</p>
+              <p class="card-text"><strong>GSM :</strong> {{ carteVisite.gsm || 'n/a'}}</p>
+              <p class="card-text"><strong>Fix :</strong> {{ carteVisite.fax || 'n/a' }}</p>
+              <p class="card-text"><strong>Email :</strong> {{ carteVisite.email|| 'n/a' }}</p>
+              <p class="card-text"><strong>Web :</strong> {{ carteVisite.web || 'n/a'}}</p>
+              <p class="card-text"><strong>Remarques :</strong> {{ carteVisite.remarques || 'n/a'}}</p>
+              <button class="btn btn-primary mt-3" (click)="openDialog(carteVisite)">Modifier</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

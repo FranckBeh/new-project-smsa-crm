@@ -1,0 +1,27 @@
+{
+    "development": {
+      "username": "root",
+      "password": "",
+      "database": "crm",
+      "host": "localhost",
+      "port": 3000,
+      "dialect": "mysql"
+    },
+    "test": {
+      "username": "root",
+      "password": "",
+      "database": "crm",
+      "host": "localhost",
+      "port": 3000,
+      "dialect": "mysql"
+    },
+    "production": {
+      "username": "root",
+      "password": "",
+      "database": "crm",
+      "host": "localhost",
+      "port": 3000,
+      "dialect": "mysql"
+    }
+  }
+  

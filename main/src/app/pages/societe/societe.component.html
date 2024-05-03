@@ -1,0 +1,190 @@
+<div class="row">
+  <!-- Content wrapper -->
+  <div class="content-wrapper">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h4 class="py-3 mb-4">
+        <span class="text-muted fw-light">Société /</span> List
+      </h4>
+
+      <!-- Client List Widget -->
+      <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between">
+                <div class="content-left">
+                  <span>Session</span>
+                  <div class="d-flex align-items-end mt-2">
+                    <h4 class="mb-0 me-2">21,459</h4>
+                    <small class="text-success">(+29%)</small>
+                  </div>
+                  <p class="mb-0">Total Users</p>
+                </div>
+                <div class="avatar">
+                  <span class="avatar-initial rounded bg-label-primary">
+                    <i class="bx bx-user bx-sm"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between">
+                <div class="content-left">
+                  <span>Paid Users</span>
+                  <div class="d-flex align-items-end mt-2">
+                    <h4 class="mb-0 me-2">4,567</h4>
+                    <small class="text-success">(+18%)</small>
+                  </div>
+                  <p class="mb-0">Last week analytics </p>
+                </div>
+                <div class="avatar">
+                  <span class="avatar-initial rounded bg-label-danger">
+                    <i class="bx bx-user-check bx-sm"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between">
+                <div class="content-left">
+                  <span>Active Users</span>
+                  <div class="d-flex align-items-end mt-2">
+                    <h4 class="mb-0 me-2">19,860</h4>
+                    <small class="text-danger">(-14%)</small>
+                  </div>
+                  <p class="mb-0">Last week analytics</p>
+                </div>
+                <div class="avatar">
+                  <span class="avatar-initial rounded bg-label-success">
+                    <i class="bx bx-group bx-sm"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between">
+                <div class="content-left">
+                  <span>Pending Users</span>
+                  <div class="d-flex align-items-end mt-2">
+                    <h4 class="mb-0 me-2">237</h4>
+                    <small class="text-success">(+42%)</small>
+                  </div>
+                  <p class="mb-0">Last week analytics</p>
+                </div>
+                <div class="avatar">
+                  <span class="avatar-initial rounded bg-label-warning">
+                    <i class="bx bx-user-voice bx-sm"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- Client List Table -->
+      <div class="card">
+        <div class="table-responsive m-t-16 ">
+          <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="row mx-1">
+              <div
+                class="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+                <div class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start mt-md-0 mt-3">
+                  <div class="dt-buttons btn-group flex-wrap">
+                    <a class="btn btn-secondary mat-raised-button btn-primary" (click)="openDialog()"  tabindex="0"
+                      aria-controls="" type="button">
+                      <span><i class="bx bx-plus me-md-1"></i><span class="d-md-inline-block d-none">Ajouter une
+                          societe</span></span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-3">
+
+                <div
+                class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0">
+                <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                      class="form-control" placeholder="Search.." aria-controls="DataTables_Table_0"></label></div>
+                <div class="dt-buttons btn-group flex-wrap">
+                  <div class="btn-group">
+                    <button
+                      class="btn buttons-collection dropdown-toggle btn-label-secondary mx-3" tabindex="0"
+                      aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog"
+                      aria-expanded="false"><span><i class="bx bx-export me-1"></i>Export</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+              <div class="row mx-2">
+                <div class="col-md-2">
+                  <div class="me-3">
+
+                  </div>
+                </div>
+                <div class="col-md-10">
+
+                </div>
+              </div>
+              <table class="user-list-table table border-top dataTable no-footer dtr-column" id="DataTables_Table_1"
+                aria-describedby="DataTables_Table_0_info" style="width: auto;">
+                <thead>
+                  <tr>
+                    <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                      aria-label="Nom: activate to sort column ascending">Nom societe</th>
+                    <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                      aria-label="ICE: activate to sort column ascending">ICE</th>
+                      <th class="sorting" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                      aria-label="Adresse: activate to sort column ascending">Adresse</th>
+                    <th class=" sorting_disabled" rowspan="1" colspan="1" style="width: 76px;" aria-label="Actions">
+                      Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let societe of societes$ | async">
+                    <td>{{ societe.nom }} </td>
+                    <td>{{ societe.ice || '-' }}</td>
+                    <td>{{ societe.adresse || '-' }}</td>
+                    <td>
+                      <div class="d-inline-block text-nowrap"><button class="btn btn-sm btn-icon"><i
+                            class="bx bx-edit"></i></button><button class="btn btn-sm btn-icon delete-record"><i
+                            class="bx bx-trash"></i></button><button class="btn btn-sm btn-icon dropdown-toggle hide-arrow"
+                          data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded me-2"></i></button>
+                        <div class="dropdown-menu dropdown-menu-end m-0"><a href="app-user-view-account.html"
+                            class="dropdown-item">View</a><a href="javascript:;" class="dropdown-item">Suspend</a></div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <mat-paginator [length]="totalSocietes" [pageSize]="itemsPerPage" [pageSizeOptions]="[5, 10, 20]"
+                [showFirstLastButtons]="true" (page)="onPageChange($event)">
+              </mat-paginator>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

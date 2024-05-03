@@ -1,0 +1,236 @@
+<div class="row">
+
+
+  <!-- Content wrapper -->
+  <div class="content-wrapper">
+
+    <!-- Content -->
+
+    <div class="container-xxl flex-grow-1 container-p-y">
+
+
+      <h4 class="py-3 mb-4">
+        <span class="text-muted fw-light">Facture /</span> List
+      </h4>
+
+      <!-- Invoice List Widget -->
+
+      <div class="card mb-4">
+        <div class="card-widget-separator-wrapper">
+          <div class="card-body card-widget-separator">
+            <div class="row gy-4 gy-sm-1">
+              <div class="col-sm-6 col-md-6 col-lg-3">
+                <div class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0">
+                  <div>
+                    <h3 class="mb-1">24</h3>
+                    <p class="mb-0">Clients</p>
+                  </div>
+                  <div class="avatar me-sm-4">
+                    <span class="avatar-initial rounded bg-label-secondary">
+                      <i class="bx bx-user bx-sm"></i>
+                    </span>
+                  </div>
+                </div>
+                <hr class="d-none d-sm-block d-lg-none me-4">
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-3">
+                <div class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-3 pb-sm-0">
+                  <div>
+                    <h3 class="mb-1">165</h3>
+                    <p class="mb-0">Invoices</p>
+                  </div>
+                  <div class="avatar me-lg-4">
+                    <span class="avatar-initial rounded bg-label-secondary">
+                      <i class="bx bx-file bx-sm"></i>
+                    </span>
+                  </div>
+                </div>
+                <hr class="d-none d-sm-block d-lg-none">
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-3">
+                <div class="d-flex justify-content-between align-items-start border-end pb-3 pb-sm-0 card-widget-3">
+                  <div>
+                    <h3 class="mb-1">$2.46k</h3>
+                    <p class="mb-0">Paid</p>
+                  </div>
+                  <div class="avatar me-sm-4">
+                    <span class="avatar-initial rounded bg-label-secondary">
+                      <i class="bx bx-check-double bx-sm"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h3 class="mb-1">$876</h3>
+                    <p class="mb-0">Unpaid</p>
+                  </div>
+                  <div class="avatar">
+                    <span class="avatar-initial rounded bg-label-secondary">
+                      <i class="bx bx-error-circle bx-sm"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoice List Table -->
+      <div class="card">
+        <div class="card-datatable table-responsive">
+          <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="row mx-1">
+              <div
+                class="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+                <div class="dataTables_length" id="DataTables_Table_0_length"><label><select
+                      name="DataTables_Table_0_length" aria-controls="" class="form-select">
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select></label></div>
+                    <div class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start mt-md-0 mt-3">
+                      <div class="dt-buttons btn-group flex-wrap">
+                        <button class="btn btn-secondary btn-primary" type="button" (click)="getEnterprises()">
+                          <span><i class="bx bx-plus me-md-1"></i><span class="d-md-inline-block d-none">Créer une facture</span></span>
+                        </button>
+                        <select class="form-select" [(ngModel)]="selectedEntreprise" (change)="onEnterpriseSelected()">
+                          <option value="" disabled selected>Choisissez une entreprise</option>
+                          <option *ngFor="let entreprise of entreprises" [value]="entreprise.idCompanie">{{ entreprise.nomCompanie }}</option>
+                        </select>
+                      </div>
+                    </div>
+
+              </div>
+              <div
+                class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-3">
+                <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                      class="form-control" placeholder="Search Invoice" aria-controls=""></label>
+                </div>
+                <div class="invoice_status mb-3 mb-md-0">
+                  <select id="UserRole" class="form-select">
+                    <option value="">Select Status</option>
+                    <option *ngFor="let type of invoiceTypes" [value]="type" class="text-capitalize">{{ type }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <table class="invoice-list-table table border-top dataTable no-footer dtr-column" id=""
+              aria-describedby="DataTables_Table_0_info" style="width: 1211px;">
+              <thead>
+                <tr>
+                  <th class="control sorting dtr-hidden" tabindex="0" aria-controls="" rowspan="1" colspan="1"
+                    style="width: 0px; display: none;" aria-label=": activate to sort column ascending">
+                  </th>
+                  <!-- Ajout des colonnes Réf., Société, NC, Date, Nbr articles, TVA, Total TTC, Date Pay., Mode Pay. -->
+                  <th *ngFor="let column of displayedColumns" [class]="getHeaderClass(column)" tabindex="0" aria-controls=""
+                    rowspan="1" colspan="1" [style.width]="getColumnWidth(column)"
+                    [attr.aria-label]="getHeaderLabel(column)" [attr.aria-sort]="getHeaderSort(column)">{{column}}</th>
+                    <th class="cell-fit sorting_disabled" rowspan="1" colspan="1" style="width: 76px;" aria-label="Actions">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr *ngFor="let invoice of invoices">
+                  <td>{{ invoice.reference }}</td>
+                  <td>{{ invoice.societe?.nom  || 'N/A'}}</td>
+                  <td>{{ invoice.nc || 'N/A' }}</td>
+                  <td>{{ invoice.date | date: 'mediumDate' }}</td>
+                  <td>{{ invoice.listinvart?.[0]?.nbrArticles || 'N/A' }}</td>
+                  <td>{{ invoice.tva || 'N/A' }}</td>
+                  <td>{{ invoice.totalTTC || 'N/A' }}</td>
+                  <td>{{ invoice.paymentDate | date: 'mediumDate' }}</td>
+                  <td>{{ invoice.paymentMode || 'N/A' }}</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <a href="javascript:;" data-bs-toggle="tooltip" class="text-body" data-bs-placement="top" aria-label="Send Mail"
+                        data-bs-original-title="Send Mail"><i class="bx bx-send mx-1"></i></a>
+                      <a href="app-invoice-preview.html" data-bs-toggle="tooltip" class="text-body" data-bs-placement="top"
+                        aria-label="Preview Invoice" data-bs-original-title="Preview Invoice"><i class="bx bx-show mx-1"></i></a>
+                      <div class="dropdown">
+                        <a href="javascript:;" class="btn dropdown-toggle hide-arrow text-body p-0" data-bs-toggle="dropdown"><i
+                            class="bx bx-dots-vertical-rounded"></i></a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                          <a href="javascript:;" class="dropdown-item">Download</a>
+                          <a href="app-invoice-edit.html" class="dropdown-item">Edit</a>
+                          <a href="javascript:;" class="dropdown-item">Duplicate</a>
+                          <div class="dropdown-divider"></div>
+                          <a href="javascript:;" class="dropdown-item delete-record text-danger">Delete</a>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+<!-- Utilisez le style de pagination fourni -->
+<div class="row mx-2">
+  <div class="col-sm-12 col-md-6">
+    <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+      Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ currentPage * pageSize }} of {{ totalItems }} entries
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-6">
+    <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+      <ul class="pagination">
+        <li class="paginate_button page-item previous" [class.disabled]="currentPage === 1" (click)="currentPage > 1 && onPageChange(currentPage - 1)">
+          <a class="page-link">Précédent</a>
+        </li>
+
+        <!-- Toujours afficher le numéro de la première page -->
+        <li class="paginate_button page-item" [class.active]="currentPage === 1" (click)="onPageChange(1)">
+          <a class="page-link">1</a>
+        </li>
+
+        <!-- Affichez les pointillés si la page actuelle est loin des premières pages -->
+        <li *ngIf="shouldShowFirstEllipsis()" class="paginate_button page-item">
+          <span class="page-link">...</span>
+        </li>
+
+        <!-- Affichez les pages autour de la page actuelle -->
+        <li class="paginate_button page-item" *ngFor="let page of getMiddlePages()" [class.active]="currentPage === page" (click)="onPageChange(page)">
+          <a class="page-link">{{ page }}</a>
+        </li>
+
+        <!-- Affichez les pointillés si la page actuelle est loin des dernières pages -->
+        <li *ngIf="shouldShowLastEllipsis()" class="paginate_button page-item">
+          <span class="page-link">...</span>
+        </li>
+
+        <!-- Affichez les dernières pages si nécessaire -->
+        <ng-container *ngIf="shouldShowLastPages()">
+          <li class="paginate_button page-item" *ngFor="let page of getPagesInRange(totalItems / pageSize - 4, totalItems / pageSize)" [class.active]="currentPage === page" (click)="onPageChange(page)">
+            <a class="page-link">{{ page }}</a>
+          </li>
+        </ng-container>
+
+        <li class="paginate_button page-item next" [class.disabled]="currentPage === ceil(totalItems / pageSize)" (click)="currentPage < ceil(totalItems / pageSize) && onPageChange(currentPage + 1)">
+          <a class="page-link">Suivant</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+    <div class="content-backdrop fade"></div>
+  </div>
+  <!-- Content wrapper -->
+</div>
+
+<div class="layout-overlay layout-menu-toggle"></div>
+
+
+<!-- Drag Target Area To SlideIn Menu On Small Screens -->
+<div class="drag-target"></div>

@@ -1,0 +1,294 @@
+const db = require('../config/database');
+
+class Invoice {
+    constructor() {}
+
+    async getInvoiceCount() {
+        try {
+            const query = "SELECT COUNT(*) AS count FROM invoice";
+            const result = await db.promise().query(query);
+            return result[0].count;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getLastId() {
+        try {
+            const query = "SELECT MAX(idInv) AS lastId FROM invoice";
+            const result = await db.promise().query(query);
+            return result[0].lastId;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getInvoiceList() {
+        try {
+            const query = "SELECT * FROM invoice ORDER BY nom LIMIT 50";
+            const invoices = await db.promise().query(query);
+            return invoices;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getInvoiceById(id) {
+        try {
+            const query = "SELECT * FROM invoice WHERE idInv = ?";
+            const invoice = await db.promise().query(query, [id]);
+            return invoice[0];
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async createInvoice(invoiceData) {
+        try {
+            const query = "INSERT INTO invoice SET ?";
+            const result = await db.query(query, [invoiceData]);
+            return result.insertId;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateInvoice(id, updatedData) {
+        try {
+            const query = "UPDATE invoice SET ? WHERE idInv = ?";
+            const result = await db.promise().query(query, [updatedData, id]);
+            return result.affectedRows > 0;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async deleteInvoice(id) {
+        try {
+            const query = "DELETE FROM invoice WHERE idInv = ?";
+            const result = await db.query(query, [id]);
+            return result.affectedRows > 0;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getExportInvoices(type, dateFrom, dateTo) {
+        try {
+            const query = `
+                SELECT
+                    invoice.*,
+                    reference,
+                    (CASE WHEN (idSociete=0) THEN autreSociete ELSE societe.nom END) AS nomSociete,
+                    (CASE WHEN (idSociete=0) THEN 1 ELSE idSociete END) AS nc,
+                    SUM(quantite*autreQuantite) AS nbrArticles,
+                    ROUND(SUM(quantite*autreQuantite*postPrixUnit),2) AS totalTTC,
+                    tva AS totalTVA,
+                    utilisateur.login AS nomUtilisateur
+                FROM invoice
+                LEFT JOIN societe USING(IdSociete)
+                LEFT JOIN listinvart USING(idInv)
+                LEFT JOIN utilisateur USING(idUser)
+                WHERE
+                    type = ?
+                    AND etat = 1
+                    AND isValidated = 1
+                    AND validationDate BETWEEN ? AND ?
+                GROUP BY invoice.idInv
+                ORDER BY validationDate DESC
+            `;
+            const result = await db.query(query, [type, dateFrom, dateTo]);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getTotalRows() {
+        try {
+            const query = "SELECT FOUND_ROWS() AS totalRows";
+            const result = await db.promise().query(query);
+            return result[0].totalRows;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getListBy(where, limit, params, orderby, whereByTTC) {
+        try {
+            let query = `
+                SELECT SQL_CALC_FOUND_ROWS invoice.*,
+                reference,
+                (CASE WHEN (idSociete=0) THEN autreSociete ELSE societe.nom END) AS nomSociete,
+                (CASE WHEN (idSociete=0) THEN 1 ELSE idSociete END) AS nc,
+                SUM(quantite*autreQuantite) AS nbrArticles,
+                ROUND(SUM(quantite*autreQuantite*postPrixUnit),2) AS totalTTC,
+                tva AS totalTVA,
+                utilisateur.login AS nomUtilisateur
+                FROM invoice
+                LEFT JOIN societe USING(IdSociete)
+                LEFT JOIN listinvart USING(idInv)
+                LEFT JOIN utilisateur USING(idUser)
+                WHERE ${where}
+                GROUP BY idInv
+                ${orderby}
+                ${limit ? `LIMIT ${limit}` : ''}`;
+            
+            if (whereByTTC) {
+                query = `
+                    SELECT X.* , x.totalTTC
+                    FROM (
+                        ${query}
+                    ) X
+                    WHERE ${whereByTTC}
+                `;
+            }
+
+            const sth = await db.promise().query(query, params);
+            const data = await sth[0];
+            return data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getFirstAvailableRef(type, year = null, ref = 1) {
+        try {
+            const yearClause = year ? `AND YEAR(date) = ${year}` : '';
+            const query = `
+                SELECT IFNULL(MIN(t1.reference + 1), ${ref}) AS nextRef
+                FROM (
+                    (SELECT reference, YEAR(date) AS year FROM invoice)
+                    UNION
+                    (SELECT ${ref - 1} AS reference, ${year || 'YEAR(CURDATE())'} AS year)
+                ) t1
+                LEFT JOIN invoice t2 ON (
+                    t1.reference + 1 = t2.reference
+                    AND t1.year = YEAR(t2.date)
+                )
+                WHERE
+                    t2.reference IS NULL
+                    AND (t1.reference + 1) >= ${ref}
+                    ${yearClause}
+            `;
+            const result = await db.promise().query(query);
+            return result[0].nextRef;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getLastAvailableRef(type, year = null) {
+        try {
+            const yearClause = year ? `AND YEAR(date) = ${year}` : '';
+            const query = `
+                SELECT IFNULL(MAX(t1.reference + 1), 1) AS nextRef
+                FROM invoice t1
+                WHERE
+                    t1.type = ${type}
+                    ${yearClause}
+            `;
+            const result = await db.promise().query(query);
+            return result[0].nextRef;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getArticles(id) {
+        try {
+            const query = `
+                SELECT SQL_CALC_FOUND_ROWS listinvart.*,
+                ROUND((quantite*autreQuantite*postPrixUnit),2) AS totalTTC
+                FROM listinvart
+                WHERE idInv = ?
+                ORDER BY idArticle ASC
+            `;
+            const articles = await db.promise().query(query, [id]);
+            return articles;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getCommentaires(id) {
+        try {
+            const query = `
+                SELECT SQL_CALC_FOUND_ROWS listinvcmt.*, utilisateur.login AS nomUtilisateur
+                FROM listinvcmt
+                LEFT JOIN utilisateur USING(IdUser)
+                WHERE idInv = ?
+                ORDER BY idCommentaire ASC
+            `;
+            const commentaires = await db.promise().query(query, [id]);
+            return commentaires;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async addArticle(idInv, designation, postPrixUnit, prePrixUnit, quantite, autreQuantite = 1) {
+        try {
+            const query = `
+                INSERT INTO listinvart
+                SET idInv = ?, designation = ?, postPrixUnit = ?, prePrixUnit = ?, quantite = ?, autreQuantite = ?
+            `;
+            await db.promise().query(query, [idInv, designation, postPrixUnit, prePrixUnit, quantite, autreQuantite]);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async addCommentaire(idInv, IdUser, dateCommentaire, commentaire) {
+        try {
+            const query = `
+                INSERT INTO listinvcmt
+                SET idInv = ?, IdUser = ?, dateCommentaire = ?, commentaire = ?
+            `;
+            await db.promise().query(query, [idInv, IdUser, dateCommentaire, commentaire]);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async deleteAllArticles(idInv) {
+        try {
+            const query = `
+                DELETE FROM listinvart
+                WHERE idInv = ?
+            `;
+            await db.promise().query(query, [idInv]);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async deleteAllCommentaires(idInv) {
+        try {
+            const query = `
+                DELETE FROM listinvcmt
+                WHERE idInv = ?
+            `;
+            await db.promise().query(query, [idInv]);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async pay(idInv) {
+        try {
+            const query = `
+                UPDATE invoice
+                SET etat = 1, paymentDate = CURDATE()
+                WHERE idInv = ?
+            `;
+            await db.promise().query(query, [idInv]);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Ajoutez d'autres méthodes nécessaires ici
+}
+
+module.exports = new Invoice();
