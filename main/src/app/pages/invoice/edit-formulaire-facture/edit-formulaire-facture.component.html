@@ -37,7 +37,7 @@
         </div>
 
         <!-- Afficher la liste déroulante supplémentaire pour le paiement -->
-        <div *ngIf="editInvoiceForm.get('invoiceState')!.value === '1'">
+        <div *ngIf="editInvoiceForm.get('invoiceState')!.value === 1">
           <div class="mb-3">
             <label for="etatState" class="form-label">Type de paiement :</label>
             <select id="etatState" formControlName="etatState"  class="form-select">
@@ -87,7 +87,7 @@
 
 
     <!-- Champs supplémentaires pour "Facture (Payé)" -->
-    <div class="row mb-3" *ngIf="editInvoiceForm.get('etatState')!.value === '1' && editInvoiceForm.get('invoiceState')!.value === '1'">
+    <div class="row mb-3" *ngIf="editInvoiceForm.get('etatState')!.value ==='1' && editInvoiceForm.get('invoiceState')!.value ===1">
       <!-- Date de paiement -->
       <div class="col-md-4">
         <label for="paymentDate" class="form-label">Date de paiement :</label>

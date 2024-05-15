@@ -14,6 +14,7 @@ export interface DialogData {
     </div>
     <div mat-dialog-actions>
       <button mat-button (click)="onNoClick()">OK</button>
+
     </div>
   `,
 })

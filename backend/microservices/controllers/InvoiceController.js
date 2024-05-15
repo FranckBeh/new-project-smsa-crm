@@ -447,61 +447,71 @@ class InvoiceController {
     }
   }
   async updateInvoice(req, res) {
-    const t = await sequelize.transaction(); // Commencez une nouvelle transaction
-    try {
-      const { id } = req.params; // L'ID de la facture à mettre à jour
-      const { articles } = req.body; // Les articles sont directement dans le corps de la requête
+    const { idInv } = req.params.id; // Récupérez idInv à partir des paramètres de la requête
+    const data = req.body;
   
-      // Récupération de la facture existante par son ID
-      const invoiceToUpdate = await Invoice.findByPk(id, { transaction: t });
-      if (!invoiceToUpdate) {
-        await t.rollback(); // Annulez la transaction si la facture n'est pas trouvée
-        return res.status(404).json({ message: 'Facture non trouvée' });
+    const t = await sequelize.transaction(); // Démarrez une transaction
+  
+    try {
+      // Récupérez la facture à mettre à jour
+      const invoice = await Invoice.findByPk(req.params.id, { transaction: t });
+  
+      if (!invoice) {
+        await t.rollback(); // Annulez la transaction en cas d'échec
+        return res.status(404).json({ error: "Invoice not found" });
       }
   
-      // Mise à jour des données de la facture
-      await invoiceToUpdate.update(req.body, { transaction: t });
+      // Mettez à jour les détails de la facture
+      await invoice.update(data, { transaction: t });
   
-      // Traitement des articles
+      // Obtenez tous les articles existants pour cette facture
       const existingArticles = await Listinvart.findAll({
-        where: { idInv: id },
+        where: { idInv: req.params.id },
         transaction: t
       });
   
-      // Mise à jour ou ajout des articles
-      const existingArticleIds = existingArticles.map(a => a.idArticle);
-   // Mise à jour ou ajout des articles
-for (const article of articles) {
-  if (article.idArticle && existingArticleIds.includes(article.idArticle)) {
-    // Si l'article a un ID et qu'il existe déjà, mettez-le à jour
-    await Listinvart.update({
-      designation: article.designation,
-      postPrixUnit: article.postPrixUnit,
-      prePrixUnit: article.prePrixUnit,
-      quantite: article.quantite,
-      autreQuantite: article.autreQuantite
-      // Ajoutez ici d'autres champs à mettre à jour si nécessaire
-    }, {
-      where: { idArticle: article.idArticle, idInv: id },
-      transaction: t
-    });
-  } else if (!article.idArticle) {
-    // Si l'article n'a pas d'ID, ajoutez-le comme un nouvel article
-    await Listinvart.create({ ...article, idInv: id }, { transaction: t });
-  }
-}
+      // Créez un ensemble des ID des articles existants pour une recherche rapide
+      const existingArticleIds = new Set(existingArticles.map(article => article.idArticle));
+  
+      // Traitez les articles reçus pour la mise à jour ou l'ajout
+      const articlesToUpdate = [];
+      const articlesToAdd = [];
+      data.articles.forEach(article => {
+        if (article.idArticle && existingArticleIds.has(article.idArticle)) {
+          articlesToUpdate.push(article);
+        } else {
+          articlesToAdd.push({ ...article, idInv: req.params.id });
+        }
+      });
+  
+      // Mettez à jour les articles existants
+      await Promise.all(articlesToUpdate.map(article => {
+        return Listinvart.update(article, {
+          where: { idArticle: article.idArticle, idInv: req.params.id },
+          transaction: t
+        });
+      }));
+  
+      // Ajoutez de nouveaux articles
+      await Promise.all(articlesToAdd.map(article => {
+        return Listinvart.create(article, { transaction: t });
+      }));
+  
+      // Supprimez les articles qui ne sont plus présents
+      const receivedArticleIds = new Set(data.articles.map(article => article.idArticle));
+      await Promise.all(existingArticles.map(dbArticle => {
+        if (!receivedArticleIds.has(dbArticle.idArticle)) {
+          return dbArticle.destroy({ transaction: t });
+        }
+      }));
   
       await t.commit(); // Validez la transaction si tout s'est bien passé
-      res.json(invoiceToUpdate);
+      res.json(invoice); // Renvoyez la facture mise à jour avec les articles associés
     } catch (error) {
       await t.rollback(); // Annulez la transaction en cas d'erreur
-      console.error("Erreur lors de la mise à jour de la facture et de ses articles:", error);
-      res.status(500).json({ message: "Erreur lors de la mise à jour de la facture et de ses articles", error: error });
+      res.status(500).json({ error: "Error updating invoice", details: error });
     }
   }
-  
-  
-  
   
   
 
@@ -511,7 +521,7 @@ for (const article of articles) {
       const { idInv, updatedInvoiceData, newArticles } = req.body;
   
       // Récupération de la facture existante par son ID
-      const invoiceToUpdate = await Invoice.findByPk(idInv, { transaction: t });
+      const invoiceToUpdate = await Invoice.findByPk(req.params.id, { transaction: t });
       if (!invoiceToUpdate) {
         await t.rollback(); // Annulez la transaction si la facture n'est pas trouvée
         return res.status(404).send('Facture non trouvée');
@@ -538,14 +548,14 @@ for (const article of articles) {
           newArticles.map(async (article) => {
             await Listinvart.create({
               ...article,
-              idInv: idInv, // Associer le nouvel article à la facture
+              idInv: req.params.id, // Associer le nouvel article à la facture
             }, { transaction: t });
           })
         );
       }
   
       await t.commit(); // Validez la transaction si tout s'est bien passé
-      const updatedInvoiceWithArticles = await Invoice.findByPk(idInv, {
+      const updatedInvoiceWithArticles = await Invoice.findByPk(req.params.id, {
         include: [{ model: Listinvart, as: 'listinvart' }],
         transaction: t
       });

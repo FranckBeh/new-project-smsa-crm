@@ -49,12 +49,14 @@ export class EditFormulaireFactureComponent implements OnInit {
   entrepriseId: string = '';
   entreprises: Entreprise[] = [];
   entreprise: any;
+  entrepriseRecuId: number;
   entrepriseSelectionnee: Entreprise | null = null;
   detailsEntreprise: any;
   private societeId: number;
   userId: string | null;
   data: any
   invoice: any;
+  totalTVA: number;
   constructor(
     private fb: FormBuilder,
     private invoiceService: InvoiceService,
@@ -185,6 +187,7 @@ if (tvaRate >= 19 && tvaRate <= 20) {
     }
     if (this.editInvoiceForm.value.tvaRate) {
       this.calculateTotalTTC();
+      this.getTotalTVA();
     }
     this.isDataLoaded = true;
       },
@@ -265,6 +268,9 @@ if (tvaRate >= 19 && tvaRate <= 20) {
                 })
             )
           ),
+          totalHT: [invoiceData.totalHT],
+        totalTVA: [invoiceData.totalTVA],
+        totalTTC: [invoiceData.totalTTC],
         });
       });
   }
@@ -365,6 +371,20 @@ if (tvaRate >= 19 && tvaRate <= 20) {
     this.articles.removeAt(index);
   }
 
+
+
+  getArticleControl(index: number, field: string) {
+    return this.articles.at(index)?.get(field) as FormControl;
+  }
+
+  updateTotals(): void {
+    this.totalTTC = this.getTotalTTC1();
+    this.totalTVA = this.getTotalTVA();
+
+    // Mise à jour des valeurs dans le formulaire
+
+  }
+
   getTotalTTC(i: number): number {
     const article = this.articles.at(i);
     if (!article) return 0;
@@ -428,36 +448,52 @@ if (tvaRate >= 19 && tvaRate <= 20) {
     return totalHt;
   }
 
-  getArticleControl(index: number, field: string) {
-    return this.articles.at(index)?.get(field) as FormControl;
-  }
+
+
 
   onSubmit(): void {
-    if (this.editInvoiceForm) { // Assurez-vous que le formulaire est valide
+    if (this.editInvoiceForm.valid) { // Assurez-vous que le formulaire est valide
       const formValue = this.editInvoiceForm.value;
 
-      // Calcul des totaux TTC et TVA
-      const totalTTC = this.getTotalTTC1();
-      const totalTVA = this.getTotalTVA();
-
       // Mise à jour des valeurs du formulaire pour les totaux
-      this.editInvoiceForm.patchValue({
-        totalTTC: totalTTC,
-        totalTVA: totalTVA
-      });
+      this.updateTotals();
+
 
       // Préparation des articles avec les ID corrects
-      const articlesWithIds = formValue.articles.map((article: { idArticle: any; }, index: any) => ({
-        ...article,
+      const articlesWithIds = formValue.articles.map((article: { idArticle: any;designation: string; quantity: number; priceSale: number; }, index: any) => ({
+        designation: article.designation,
+        quantite: article.quantity,
+        postPrixUnit: article.priceSale,
+        autreQuantite: 1,
         idArticle: article.idArticle || null // Utilisez l'ID existant ou null pour les nouveaux articles
       }));
 
       // Création de l'objet data pour la mise à jour
       const data: InvoiceCopy = {
         ...formValue,
+        reference: formValue.reference,
+        type: formValue.invoiceState,
+        etat: formValue.etatState,
+        isProFormat: formValue.isProForma,
+        paymentMode: formValue.paymentMethod,
         isValidated: formValue.paymentDate ? 1 : 0,
-        articles: articlesWithIds
+        paymentComment: formValue.comment,
+        paymentDate: formValue.paymentDate,
+        date: formValue.creationDate,
+        tva: this.totalTVA,
+        totalTVA: formValue.tvaRate,
+        footer: formValue.note,
+        idSociete: formValue.societe,
+        adresseSociete: formValue.adresseEntreprise,
+        autreSociete: formValue.nomSociete,
+        autreQuantiteTitle: null,
+        idUser: this.userId,
+        totalTTC: this.totalTTC,
+        major: formValue.idEntreprise,
+        articles: articlesWithIds,
       };
+
+
 
       console.log('les données à modifier', data);
 
@@ -466,11 +502,25 @@ if (tvaRate >= 19 && tvaRate <= 20) {
         response => {
           console.log('La facture a été mise à jour avec succès', response);
           // Gestion de la réponse réussie
-        },
-        error => {
-          console.error('Erreur lors de la mise à jour de la facture', error);
-          // Gestion de l'erreur
-        }
+        // Afficher le modal
+        this.dialog.open(DialogComponent, {
+          data: {
+            message: 'Facture Mise à jour avec succès'
+          }
+        });
+
+        // Rediriger vers le composant principal
+        this.router.navigate(['/invoice']);
+      },
+      error => {
+        // Gestion des erreurs de soumission
+        console.error('Erreur lors de la modificiation de la facture:', error);
+        this.dialog.open(DialogComponent, {
+          data: {
+            message: 'Erreur lors de la modificiation de la facture'
+          }
+        });
+      }
       );
     } else {
       console.error("Le formulaire n'est pas valide");

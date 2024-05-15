@@ -1,3 +1,4 @@
+
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -25,6 +26,7 @@ import { HeaderComponent } from './layouts/full/header/header.component';
 import { BrandingComponent } from './layouts/full/sidebar/branding.component';
 import { AppNavItemComponent } from './layouts/full/sidebar/nav-item/nav-item.component';
 import { LogoutDialogComponent } from './layouts/full/header/logoutDialog.component';
+import {DialogComponent} from './layouts/dialog/dialog.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +37,8 @@ import { LogoutDialogComponent } from './layouts/full/header/logoutDialog.compon
     HeaderComponent,
     BrandingComponent,
     AppNavItemComponent,
-    LogoutDialogComponent
+    LogoutDialogComponent,
+    DialogComponent,
   ],
   imports: [
     BrowserModule,
