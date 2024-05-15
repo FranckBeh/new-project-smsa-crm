@@ -1,0 +1,139 @@
+<div class="container" id="">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            {{ getTypeText(invoice.type) }} / {{ invoice.reference }}
+          </h3>
+          <h4 class="mb-0">{{ getEtatText(invoice.etat) }}</h4>
+        </div>
+        <div class="card-body" id="pdf-content">
+          <div class="row">
+            <div class="col-md-6 text-left">
+              <img
+                class="img-fluid"
+                src="/assets/images/logos/logo_smsa.jpg"
+                alt="Company Logo"
+                style="width: 100px"
+              />
+            </div>
+            <div class="col-md-6 text-right">
+              <h5 class="card-title">
+                {{ invoice.parametreCompanie.nomCompanie }}
+              </h5>
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-md-12 text-right d-flex justify-content-end">
+              <div class="col-6">
+                <h6 *ngIf="invoice.nc !== 1">{{ invoice.societe.nom }}</h6>
+                <h6 *ngIf="invoice.nc !== 1">{{ invoice.societe.adresse }}</h6>
+                <h6 *ngIf="invoice.nc === 1">{{ invoice.autreSociete }}</h6>
+                <h6 *ngIf="invoice.nc === 1">{{ invoice.adresseSociete }}</h6>
+                <p><strong>ICE:</strong> {{ invoice.societe.ice }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 text-center align-self-center">
+              <h4 class="text-center">
+                <span class="border p-2">
+                  {{ getTypeText(invoice.type) }} N° 000{{
+                    invoice.reference
+                  }}/{{ invoice.dateCreation | date : "yyyy" }}
+                </span>
+              </h4>
+            </div>
+          </div>
+
+          <hr />
+          <div class="table-responsive">
+            <table class="table table-bordered custom-table">
+              <thead>
+                <tr>
+                  <th>Désignation</th>
+                  <th>Quantité</th>
+                  <th>Prix unitaire</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of invoice.listinvart">
+                  <td class="designation-cell">{{ item.designation }}</td>
+                  <td>{{ item.quantite }}</td>
+                  <td>{{ item.postPrixUnit | number : "1.2-2" }} DH</td>
+                  <td>
+                    {{
+                      item.quantite * item.postPrixUnit | number : "1.2-2"
+                    }}
+                    DH
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-right"><strong>TVA:</strong></td>
+                  <td class="text-left text-danger">
+                    {{ invoice.tva | number : "1.2-2" }} DH
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-right">
+                    <strong>Total TTC:</strong>
+                  </td>
+                  <td class="text-left text-danger">
+                    {{ invoice.totalTTC | number : "1.2-2" }} DH
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="row hide-pdf">
+            <div class="col-md-6">
+              <P>
+                Créer par : <span> {{ invoice.utilisateur.login }}</span> <br />
+                le :
+                <span>
+                  {{ invoice.dateCreation | date : "mediumDate" || "--" }}</span
+                >
+              </P>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 text-center">
+             <a [routerLink]="['/invoice/edit-formulaire-facture', invoice.idInv]"  class="btn btn-primary mt-3 hide-pdf">Modifier</a>
+
+            </div>
+            <div class="col-md-6 text-center">
+              <button class="btn btn-secondary mt-3 hide-pdf" (click)="exportToPDF()">Imprimer</button>
+            </div>
+          </div>
+          <div class="card-footer text-muted text-center" id="pdf-footer">
+            <p>
+              <i class="fa fa-map-marker-alt"></i>
+              {{ invoice.parametreCompanie.adresseCompanie }} <br />
+              <i class="fa fa-phone"></i>
+              {{ invoice.parametreCompanie.tel1Companie }} &nbsp;&nbsp;&nbsp;|
+              <i class="fa fa-envelope"></i>
+              {{
+                invoice.parametreCompanie.email1Compagnie
+              }}
+              &nbsp;&nbsp;&nbsp;|
+              {{ invoice.parametreCompanie.sitewebCompagnie }}
+              <br />
+              ICE: {{ invoice.parametreCompanie.ice }} | IF:
+              {{ invoice.parametreCompanie.identifiantFiscal }} | RC:
+              {{ invoice.parametreCompanie.registreCommerce }} |
+            </p>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>

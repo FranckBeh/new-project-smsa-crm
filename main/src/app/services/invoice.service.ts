@@ -6,6 +6,9 @@ import { Invoice } from '../models/invoice.model'; // Assurez-vous que le chemin
   providedIn: 'root'
 })
 export class InvoiceService {
+  getInvoiceDataById(id: number) {
+    throw new Error('Method not implemented.');
+  }
   private invoices: Invoice[] = []; // Simule une base de données pour stocker les factures
 
   constructor() { }

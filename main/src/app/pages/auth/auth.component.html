@@ -1,0 +1,42 @@
+<div class="blank-layout-container justify-content-center align-items-center bg-light-primary">
+  <div class="position-relative row w-100 h-100 bg-gredient justify-content-center">
+    <div class="col-lg-4 d-flex align-items-center">
+      <mat-card class="cardWithShadow boxed-auth">
+        <mat-card-content class="p-32">
+          <div class="text-center">
+            <a>
+              <img
+                src="./assets/images/logos/logo-smsa.png"
+                class="align-middle m-2"
+                alt="logo"
+              />
+            </a>
+          </div>
+
+          <!-- Formulaire de connexion -->
+          <!-- Formulaire de connexion -->
+<form (ngSubmit)="login()">
+  <div>
+    <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Nom d'utilisateur</mat-label>
+    <mat-form-field appearance="outline" class="w-100" color="primary">
+      <input matInput name="login" [(ngModel)]="loginData.login" required>
+    </mat-form-field>
+  </div>
+  <div>
+    <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Mot de passe</mat-label>
+    <mat-form-field appearance="outline" class="w-100" color="primary">
+      <input matInput name="password" type="password" [(ngModel)]="loginData.password" required>
+    </mat-form-field>
+  </div>
+  <button type="submit" mat-flat-button color="primary" class="w-100">Se connecter</button>
+  <!-- Afficher le message d'erreur ici -->
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+</form>
+<!-- Fin du formulaire de connexion -->
+
+          <!-- Fin du formulaire de connexion -->
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

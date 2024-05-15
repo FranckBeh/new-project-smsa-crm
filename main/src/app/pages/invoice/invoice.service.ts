@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { Societe } from './invoice.model';
+import { InvoicePreview, Societe } from './invoice.model';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,8 @@ export class InvoiceService {
   public societes$: Observable<Societe[]> = this.societesSubject.asObservable();
   // Observable public pour les erreurs
   public errorOccurred: Observable<string | null> = this.errorSubject.asObservable();
+
+  private authService: AuthService;
 
   constructor(private http: HttpClient) {
 
@@ -63,20 +66,30 @@ export class InvoiceService {
     );
   }
 
-  getInvoiceById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+  getInvoiceDataById2(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/data/${id}`).pipe(
       catchError(this.handleError)
     );
+  }
+
+  getInvoiceDataById(id: number): Observable<InvoicePreview> {
+    return this.http.get<InvoicePreview>(`${this.apiUrl}/data/${id}`);
   }
 
   createInvoice(invoiceData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}`, invoiceData).pipe(
+    // Récupérer l'ID de l'utilisateur
+
+    // Ajouter l'ID de l'utilisateur aux données de la facture
+    const data = { ...invoiceData };
+
+    return this.http.post<any>(`${this.apiUrl}/createInvoice`, data).pipe(
       catchError(this.handleError)
     );
   }
 
-  updateInvoice(id: number, updatedData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, updatedData).pipe(
+
+  updateInvoice(id: number, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/edit/${id}`, data).pipe(
       catchError(this.handleError)
     );
   }
@@ -106,17 +119,17 @@ export class InvoiceService {
     );
   }
 
-  getFirstAvailableRef(type: number, year: number | null = null, ref: number = 1): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/firstAvailableRef?type=${type}&year=${year}&ref=${ref}`).pipe(
-      catchError(this.handleError)
-    );
+  getFirstAvailableRef(type: number): Observable<any> {
+    const currentYear = new Date().getFullYear();
+    const url = `${this.apiUrl}/first-ref/${type}/${currentYear}`;
+    return this.http.get<any>(url);
+  }
+  getLastAvailableRef(type: number): Observable<any> {
+    const currentYear = new Date().getFullYear();
+    const url = `${this.apiUrl}/last-ref/${type}/${currentYear}`;
+    return this.http.get<any>(url);
   }
 
-  getLastAvailableRef(type: number, year: number | null = null): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/lastAvailableRef?type=${type}&year=${year}`).pipe(
-      catchError(this.handleError)
-    );
-  }
 
   getArticles(id: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${id}/articles`).pipe(

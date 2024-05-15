@@ -33,11 +33,12 @@ Invoice.init({
   },
   validationDate: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+    allowNull: true,
+
   },
   paymentMode: {
     type: DataTypes.INTEGER,
-    defaultValue: 0,
+    allowNull: true,
   },
   paymentComment: {
     type: DataTypes.STRING(200),

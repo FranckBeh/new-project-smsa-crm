@@ -1,13 +1,26 @@
-import { SocieteModule } from './pages/societe/societe.module';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
+import { AuthGuard } from './auth.guard';
 
 const routes: Routes = [
   {
+    path: 'auth',
+    component: BlankComponent,
+    loadChildren: () => import('./pages/auth/auth.module').then( (m) => m.AuthModule ),
+  },
+  {
+    path: 'authentication',
+    loadChildren: () =>
+      import('./pages/authentication/authentication.module').then(
+        (m) => m.AuthenticationModule
+      ),
+  },
+  {
     path: '',
     component: FullComponent,
+    canActivate: [AuthGuard],
     children: [
       {
         path: 'dashboard',
@@ -24,7 +37,7 @@ const routes: Routes = [
       {
         path: 'clients',
         loadChildren: () =>
-        import('./pages/clients/clients.module').then((m) => m.ClientModule),
+          import('./pages/clients/clients.module').then((m) => m.ClientModule),
       },
       {
         path: 'freelancers',
@@ -88,12 +101,8 @@ const routes: Routes = [
     ],
   },
   {
-    path: 'authentication',
-    component: BlankComponent,
-    loadChildren: () =>
-      import('./pages/authentication/authentication.module').then(
-        (m) => m.AuthenticationModule
-      ),
+    path: '**', // Gérer les autres cas de route ici
+    redirectTo: '/dashboard', // Redirection vers la page par défaut
   },
 ];
 

@@ -12,7 +12,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import * as TablerIcons from 'angular-tabler-icons/icons';
 
-import { AuthenticationRoutes } from './authentication.routing';
+import { AuthenticationRoutingModule } from './authentication.routing';
 
 import { AppSideLoginComponent } from './login/login.component';
 import { AppSideRegisterComponent } from './register/register.component';
@@ -20,7 +20,7 @@ import { AppSideRegisterComponent } from './register/register.component';
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule.forChild(AuthenticationRoutes),
+    AuthenticationRoutingModule,
     MatIconModule,
     MatCardModule,
     MatInputModule,

@@ -8,6 +8,7 @@ Utilisateur.init({
   IdUser: {
     type: DataTypes.INTEGER,
     primaryKey: true,
+    autoIncrement: true,
     allowNull: false
   },
   login: DataTypes.STRING(100),

@@ -21,6 +21,8 @@ import { ExportAsModule } from 'ngx-export-as';
 import { AppInvoiceComponent } from './invoice.component';
 import { InvoiceRoutingModule } from './invoice.routing';
 import { FormulaireFactureComponent } from './formulaire-facture/formulaire-facture.component';
+import { EditFormulaireFactureComponent } from './edit-formulaire-facture/edit-formulaire-facture.component';
+import { PreviewFactureComponent } from './preview-facture/preview-facture/preview-facture.component';
 
 @NgModule({
   imports: [
@@ -44,7 +46,9 @@ import { FormulaireFactureComponent } from './formulaire-facture/formulaire-fact
   ],
   declarations: [
     AppInvoiceComponent,
+    EditFormulaireFactureComponent,
     FormulaireFactureComponent,
+    PreviewFactureComponent,
   ]
 })
 export class InvoiceModule { }

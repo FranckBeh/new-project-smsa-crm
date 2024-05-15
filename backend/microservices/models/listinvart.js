@@ -8,7 +8,8 @@ Listinvart.init({
   idArticle: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true,
   },
   idInv: {
     type: DataTypes.INTEGER,

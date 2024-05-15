@@ -1,13 +1,29 @@
 <!-- formulaire-facture.component.html -->
-<div class="container mt-3">
-  <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
+<div class="container mt-3" *ngIf="entreprise">
+  <!-- Flèche de retour -->
+  <a routerLink="/invoice" class="btn btn-outline-primary mb-3">
+    <i class="fa fa-arrow-left"></i> Retour
+  </a>
+
+  <form [formGroup]="invoiceForm" class="needs-validation" novalidate>
     <!-- État de la facture -->
+    <div *ngIf="entreprise">
+      <div class="mb-3">
+        <label class="form-label">Facture: </label>
+        <input type="text" class="form-control" formControlName="nomEntreprise" readonly>
+      </div>
+      <div class="mb-3" style="display: none;">
+        <label class="form-label">ID de l'entreprise :</label>
+        <input type="text" class="form-control" formControlName="idEntreprise" readonly>
+      </div>
+      <!-- Ajoutez d'autres détails de l'entreprise ici -->
+    </div>
     <div class="row gy-2 gx-3 align-items-center">
       <div class="col-md-4">
         <div class="mb-3">
           <label for="invoiceState" class="form-label">Type :</label>
           <select id="invoiceState" formControlName="invoiceState" class="form-select" required>
-            <option value="">Sélectionnez un type</option>
+            <option value="" disabled selected>Sélectionnez un type</option>
             <option value="1">Facture</option>
             <option value="0">Devis</option>
             <option value="2">Bon de livraison</option>
@@ -15,17 +31,17 @@
             <option value="4">Bon de commande</option>
           </select>
           <div class="invalid-feedback"
-            *ngIf="invoiceForm.get('invoiceState')?.invalid && (invoiceForm.get('invoiceState')?.dirty || invoiceForm.get('invoiceState')?.touched)">
+            *ngIf="invoiceForm.get('invoiceState')!.invalid && (invoiceForm.get('invoiceState')!.dirty || invoiceForm.get('invoiceState')!.touched)">
             Veuillez choisir un état de facture.
           </div>
         </div>
 
         <!-- Afficher la liste déroulante supplémentaire pour le paiement -->
-        <div *ngIf="invoiceForm.get('invoiceState')?.value === '1'">
+        <div *ngIf="invoiceForm.get('invoiceState')!.value === '1'">
           <div class="mb-3">
             <label for="etatState" class="form-label">Type de paiement :</label>
-            <select id="etatState" formControlName="etatState"  class="form-select" required="required">
-              <option value="">Sélectionnez un type facture</option>
+            <select id="etatState" formControlName="etatState"  class="form-select">
+              <option value="" disabled selected>Sélectionnez un type facture</option>
               <option value="1">Payer</option>
               <option value="0">En créance</option>
             </select>
@@ -48,11 +64,8 @@
           <label for="reference" class="form-label">Référence :</label>
           <input type="text" id="reference" formControlName="reference" class="form-control" readonly>
           <div class="invalid-feedback"
-            *ngIf="invoiceForm.get('reference')?.invalid && (invoiceForm.get('reference')?.dirty || invoiceForm.get('reference')?.touched)">
+            *ngIf="invoiceForm.get('reference')!.invalid && (invoiceForm.get('reference')!.dirty || invoiceForm.get('reference')!.touched)">
             La référence est requise.
-          </div>
-          <div class="col-auto">
-            <label class="d-none" for="">rien</label>
           </div>
         </div>
       </div>
@@ -61,15 +74,11 @@
       <div class="col-md-4">
         <div class="mb-3">
           <label for="creationDate" class="form-label">Date de création :</label>
-          <input type="date" id="creationDate" formControlName="creationDate" class="form-control">
+          <input type="date" id="creationDate" formControlName="creationDate" class="form-control" required>
           <div class="invalid-feedback"
-            *ngIf="invoiceForm.get('creationDate')?.invalid && (invoiceForm.get('creationDate')?.dirty || invoiceForm.get('creationDate')?.touched)">
+            *ngIf="invoiceForm.get('creationDate')!.invalid && (invoiceForm.get('creationDate')!.dirty || invoiceForm.get('creationDate')!.touched)">
             La date de création est requise.
           </div>
-        </div>
-
-        <div class="col-auto">
-          <label class="d-none" for="">rien</label>
         </div>
       </div>
 
@@ -78,17 +87,24 @@
 
 
     <!-- Champs supplémentaires pour "Facture (Payé)" -->
-    <div class="row mb-3" *ngIf="invoiceForm.get('etatState')?.value === '1'">
+    <div class="row mb-3" *ngIf="invoiceForm.get('etatState')!.value === '1' && invoiceForm.get('invoiceState')!.value === '1'">
       <!-- Date de paiement -->
       <div class="col-md-4">
         <label for="paymentDate" class="form-label">Date de paiement :</label>
-        <input type="date" id="paymentDate" formControlName="paymentDate" class="form-control">
+        <input type="date" id="paymentDate" formControlName="paymentDate" class="form-control" required>
       </div>
 
       <!-- Moyen de paiement -->
       <div class="col-md-4">
         <label for="paymentMethod" class="form-label">Moyen de paiement :</label>
-        <input type="text" id="paymentMethod" formControlName="paymentMethod" class="form-control">
+        <select id="paymentMethod" formControlName="paymentMethod" class="form-select" required>
+          <option value="" disabled selected>Sélectionnez un Moyen de paiement</option>
+          <option value="0">Cash</option>
+          <option value="1">Chèque</option>
+          <option value="2">Effet</option>
+          <option value="3">Carte bancaire</option>
+          <option value="4">Virement</option>
+        </select>
       </div>
 
       <!-- Commentaire -->
@@ -108,7 +124,7 @@
                    aria-label="Société"
                    matInput
                    [formControl]="societeControl"
-                   [matAutocomplete]="auto">
+                   [matAutocomplete]="auto" id="societe">
                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onSocieteSelected($event)">
 
                     <mat-option *ngFor="let societe of filteredSocietes | async" [value]="societe">
@@ -125,13 +141,13 @@
       </div>
     </div>
     <!-- Ajouter les champs pour préciser le nom de l'entreprise et l'adresse -->
-    <div class="row" *ngIf="invoiceForm.get('societe')?.value && invoiceForm.get('societe')?.value === 'Autre'">
+    <div class="row" *ngIf="invoiceForm.get('societe')!.value === 0">
       <div class="col-md-6">
         <!-- Nom de l'entreprise -->
         <div class="mb-3">
           <label for="nomSociete" class="form-label">Nom de l'entreprise :</label>
-          <input type="text" id="nomSociete" formControlName="nomSociete" class="form-control">
-          <div class="invalid-feedback" *ngIf="invoiceForm.get('nomSociete')?.invalid && (invoiceForm.get('nomSociete')?.dirty || invoiceForm.get('nomSociete')?.touched)">
+          <input type="text" formControlName="nomSociete" (blur)="validateField('nomSociete')" class="form-control">
+          <div class="invalid-feedback" *ngIf="invoiceForm.get('nomSociete')!.invalid && (invoiceForm.get('nomSociete')!.dirty || invoiceForm.get('nomSociete')!.touched)">
             Le nom de l'entreprise est requis.
           </div>
         </div>
@@ -140,8 +156,8 @@
         <!-- Adresse de l'entreprise -->
         <div class="mb-3">
           <label for="adresseEntreprise" class="form-label">Adresse de l'entreprise :</label>
-          <input type="text" id="adresseEntreprise" formControlName="adresseEntreprise" class="form-control">
-          <div class="invalid-feedback" *ngIf="invoiceForm.get('adresseEntreprise')?.invalid && (invoiceForm.get('adresseEntreprise')?.dirty || invoiceForm.get('adresseEntreprise')?.touched)">
+          <input type="text" id="adresseEntreprise" formControlName="adresseEntreprise" class="form-control" required>
+          <div class="invalid-feedback error-message" *ngIf="invoiceForm.get('adresseEntreprise')!.invalid && (invoiceForm.get('adresseEntreprise')!.dirty || invoiceForm.get('adresseEntreprise')!.touched)">
             L'adresse de l'entreprise est requise.
           </div>
         </div>
@@ -170,8 +186,8 @@
           <!-- Prix unitaire TTC de vente -->
           <div class="col-md-3 col-12 mb-md-0 mb-3">
             <p class="mb-2 repeater-title">PU de vente :</p>
-            <input type="number" id="priceSale{{i}}" formControlName="priceSale"
-              class="form-control invoice-item-price mb-2" required (input)="calculateTotalTTC()">
+            <input type="number" aria-valuemin="1" id="priceSale{{i}}" formControlName="priceSale"
+              class="form-control invoice-item-price mb-2" required (input)="calculateTotalTTC()" >
             <div class="invalid-feedback"
               *ngIf="getArticleControl(i, 'priceSale').invalid && (getArticleControl(i, 'priceSale').dirty || getArticleControl(i, 'priceSale').touched)">
               Le prix unitaire TTC de vente est requis.
@@ -181,7 +197,7 @@
           <!-- Quantité -->
           <div class="col-md-2 col-12 mb-md-0 mb-3">
             <p class="mb-2 repeater-title">Quantité :</p>
-            <input type="number" id="quantity{{i}}" formControlName="quantity" class="form-control invoice-item-qty"
+            <input type="number" aria-valuemin="1" id="quantity{{i}}" formControlName="quantity" class="form-control invoice-item-qty"
               required (input)="calculateTotalTTC()">
             <div class="invalid-feedback"
               *ngIf="getArticleControl(i, 'quantity').invalid && (getArticleControl(i, 'quantity').dirty || getArticleControl(i, 'quantity').touched)">
@@ -233,7 +249,7 @@
         <div class="card mb-2 flex-grow-1">
           <div class="card-body">
             <h5 class="card-title">Montant de la TVA</h5>
-            <p class="card-text">{{ getTotalTVA() | currency:' MAD' }}</p>
+            <p class="card-text" >{{ getTotalTVA() | currency:' MAD' }}</p>
           </div>
         </div>
       </div>
@@ -253,14 +269,22 @@
       <label for="note" class="form-label">Note :</label>
       <textarea id="note" formControlName="note" class="form-control"></textarea>
       <div class="invalid-feedback"
-        *ngIf="invoiceForm.get('note')?.invalid && (invoiceForm.get('note')?.dirty || invoiceForm.get('note')?.touched)">
+        *ngIf="invoiceForm.get('note')!.invalid && (invoiceForm.get('note')!.dirty || invoiceForm.get('note')!.touched)">
         La note est requise.
       </div>
     </div>
 
     <!-- Bouton de soumission -->
     <div class="mb-3">
-      <button type="submit" class="btn btn-success" (click)="onSubmit">Enregistrer la facture</button>
+      <button type="submit" class="btn btn-success" (click)="onSubmit()">Enregistrer la facture</button>
     </div>
   </form>
+</div>
+
+<div class="container mt-3" *ngIf="!entreprise" style="text-align: center; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
+  <p style="font-size: 20px; color: #333;">Aucune entreprise n'est sélectionnée.</p>
+
+  <a routerLink="/invoice" class="btn btn-outline-primary mb-3" style="font-size: 18px; padding: 10px 20px;">
+    <i class="fa fa-arrow-left"></i> Retour
+  </a>
 </div>

@@ -1,3 +1,4 @@
+import { AuthService } from './../../../pages/authentication/authentication.service';
 import {
   Component,
   Output,
@@ -6,7 +7,9 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-
+import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { LogoutDialogComponent } from './logoutDialog.component';
 
 @Component({
   selector: 'app-header',
@@ -22,5 +25,25 @@ export class HeaderComponent {
 
   showFiller = false;
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog, public authService: AuthService, public router: Router, public snackBar: MatSnackBar) {}
+
+  public showMessage(message: string): void {
+    this.snackBar.open(message, 'Fermer', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
+  }
+  logout(): void {
+    const dialogRef = this.dialog.open(LogoutDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.authService.logout();
+        // console.log('Logout successful');
+        this.router.navigate(['/auth']); // Redirigez l'utilisateur vers la page de connexion après la déconnexion réussie si nécessaire
+      }
+    });
+  }
+
 }

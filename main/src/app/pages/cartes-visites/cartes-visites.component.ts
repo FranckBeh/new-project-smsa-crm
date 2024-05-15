@@ -58,7 +58,7 @@ export class AppCartesVisitesComponent implements OnInit {
     debouncedSearch.subscribe(
       (results: any[]) => {
         // If no logo provided, use default logo
-        this.searchResults = results.map((result: any) => {
+        this.searchResults = results?.map((result: any) => {
           if (!result.logo) {
             result.logo = this.defaultLogo;
           }

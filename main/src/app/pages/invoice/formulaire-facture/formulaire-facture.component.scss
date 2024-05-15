@@ -12,3 +12,14 @@
 .example-full-width {
   width: 100%;
 }
+
+.invalid-feedback {
+  color: #dc3545; /* Couleur du texte pour les messages d'erreur */
+  font-size: 0.875rem; /* Taille de la police pour les messages d'erreur */
+}
+
+.error-message {
+  color: #dc3545; /* Couleur du texte pour les messages d'erreur */
+  font-size: 0.875rem; /* Taille de la police pour les messages d'erreur */
+  margin-top: 0.25rem; /* Marge supérieure pour séparer le message d'erreur du champ */
+}

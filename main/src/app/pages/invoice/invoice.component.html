@@ -94,9 +94,9 @@
                     </select></label></div>
                     <div class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start mt-md-0 mt-3">
                       <div class="dt-buttons btn-group flex-wrap">
-                        <button class="btn btn-secondary btn-primary" type="button" (click)="getEnterprises()">
-                          <span><i class="bx bx-plus me-md-1"></i><span class="d-md-inline-block d-none">Créer une facture</span></span>
-                        </button>
+
+                          <span><span class="d-md-inline-block d-none">Créer une facture :</span></span>
+
                         <select class="form-select" [(ngModel)]="selectedEntreprise" (change)="onEnterpriseSelected()">
                           <option value="" disabled selected>Choisissez une entreprise</option>
                           <option *ngFor="let entreprise of entreprises" [value]="entreprise.idCompanie">{{ entreprise.nomCompanie }}</option>
@@ -137,26 +137,30 @@
 
                 <tr *ngFor="let invoice of invoices">
                   <td>{{ invoice.reference }}</td>
-                  <td>{{ invoice.societe?.nom  || 'N/A'}}</td>
-                  <td>{{ invoice.nc || 'N/A' }}</td>
+                  <td>{{ invoice.societe?.nom  || '--'}}</td>
+                  <td>{{ invoice.nc || '-' }}</td>
                   <td>{{ invoice.date | date: 'mediumDate' }}</td>
-                  <td>{{ invoice.listinvart?.[0]?.nbrArticles || 'N/A' }}</td>
-                  <td>{{ invoice.tva || 'N/A' }}</td>
-                  <td>{{ invoice.totalTTC || 'N/A' }}</td>
-                  <td>{{ invoice.paymentDate | date: 'mediumDate' }}</td>
-                  <td>{{ invoice.paymentMode || 'N/A' }}</td>
+                  <td>{{ invoice.totalQuantite || '0' }}</td>
+                  <td>{{ invoice.totalTVA || '0.00' }}</td>
+                  <td>{{ invoice.totalTTC|| '0.00' }}</td>
+                  <td>{{ invoice.paymentDate | date: 'mediumDate' ||'--'}}</td>
+                  <td> {{ getPaymentModeText(invoice.paymentMode) || 'Impayé' }}</td>
+                  
                   <td>
                     <div class="d-flex align-items-center">
                       <a href="javascript:;" data-bs-toggle="tooltip" class="text-body" data-bs-placement="top" aria-label="Send Mail"
                         data-bs-original-title="Send Mail"><i class="bx bx-send mx-1"></i></a>
-                      <a href="app-invoice-preview.html" data-bs-toggle="tooltip" class="text-body" data-bs-placement="top"
-                        aria-label="Preview Invoice" data-bs-original-title="Preview Invoice"><i class="bx bx-show mx-1"></i></a>
+
+                        <a [routerLink]="['/invoice/preview-facture', invoice.idInv]" data-bs-toggle="tooltip" class="text-body" data-bs-placement="top" aria-label="Prévisualiser la facture" data-bs-original-title="Prévisualiser la facture">
+                          <i class="bx bx-show mx-1"></i>
+                        </a>
+                        
                       <div class="dropdown">
                         <a href="javascript:;" class="btn dropdown-toggle hide-arrow text-body p-0" data-bs-toggle="dropdown"><i
                             class="bx bx-dots-vertical-rounded"></i></a>
                         <div class="dropdown-menu dropdown-menu-end">
                           <a href="javascript:;" class="dropdown-item">Download</a>
-                          <a href="app-invoice-edit.html" class="dropdown-item">Edit</a>
+                          <a [routerLink]="['/invoice/edit-formulaire-facture', invoice.idInv]" class="dropdown-item">Edit</a>
                           <a href="javascript:;" class="dropdown-item">Duplicate</a>
                           <div class="dropdown-divider"></div>
                           <a href="javascript:;" class="dropdown-item delete-record text-danger">Delete</a>

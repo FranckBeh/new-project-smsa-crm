@@ -3,13 +3,16 @@ const dotenv = require('dotenv');
 const pino = require('pino');
 const cors = require('cors');
 const { Sequelize } = require('sequelize');
-const UserController = require('./test1/UserController');
+const utilisateurRouter = require('./microservices/routes/utilisateur.routes.js');
 const invoiceRouter = require('./microservices/routes/invoice.routes');
 const clientRouter = require('./microservices/routes/client.routes.js');
-const userRoutes = require('./test1/user.routes.js');  //
+//const userRoutes = require('./test1/user.routes.js');  //
 const societeRouter = require('./microservices/routes/societe.routes.js');
 const carteVisiteRouter = require('./microservices/routes/cartevisite.routes.js');
 const compagnieRouter =require('./microservices/routes/companie.routes.js');
+const authMiddleware = require('./microservices/middlewares/authMiddleware.js');
+const authzMiddleware = require('./microservices/middlewares/authzMiddleware.js');
+const authRoutes = require('./microservices/routes/auth.routes.js');
 
 
 // Chargement des variables d'environnement
@@ -63,14 +66,27 @@ app.use(express.json());
 app.use(cors());
 
 
+
+// Middleware d'autorisation
+//app.use(authzMiddleware);
+
+// Enregistrement des routes d'authentification
+app.use('/auth', authRoutes);
+
+
+// Middleware d'authentification
+app.use(authMiddleware);
+
+
 // Enregistrement des routeurs
 app.use('/invoices/', invoiceRouter);
 app.use('/clients/', clientRouter);
 //app.use('/count/', clientRouter);
-app.use('/user', userRoutes);
+app.use('/user', utilisateurRouter);
 app.use('/societes', societeRouter);
 app.use('/cartesvisites', carteVisiteRouter);
 app.use('/companies', compagnieRouter);
+
 
 // ... (autres routes pour d'autres fonctionnalités)
 
