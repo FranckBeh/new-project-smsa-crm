@@ -114,6 +114,218 @@ class InvoiceController {
         });
     }
   }
+  async searchInvoicesOld(req, res) {
+    try {
+      const { company, type, etat, reference, dateCreation } = req.query;
+      console.log("Valeurs envoyées depuis le frontend : ", req.query);
+      // Construisez votre requête en fonction des critères de recherche
+      const whereClause = {};
+      if (company) {
+        whereClause.major = company; // Assurez-vous que 'major' est la clé étrangère de l'entreprise dans la table 'Invoice'
+      }
+      if (type) {
+        whereClause.type = type;
+      }
+      if (etat) {
+        whereClause.etat = etat;
+      }
+      if (reference) {
+        whereClause.reference = reference;
+      }
+      if (dateCreation) {
+        whereClause.dateCreation = dateCreation;
+      }
+  
+      // Obtenir les factures correspondantes
+      const invoices = await Invoice.findAll({
+        include: [
+          {
+            model: Societe,
+            as: "societe",
+            attributes: ["nom"],
+          },
+        ],
+        attributes: [
+          "idInv",
+          "reference",
+          [
+            Sequelize.literal(
+              "(case when (Invoice.idSociete=0) then 1 else Invoice.idSociete end)"
+            ),
+            "nc",
+          ],
+          "date",
+          "tva",
+          "paymentDate",
+          "paymentMode",
+        ],
+        where: whereClause, // Utilisation des clauses où conditionnelles
+        order: [["date", "DESC"]],
+      });
+  
+      // Pour chaque facture, obtenir les articles et calculer le nombre d'articles et le total TTC
+      for (const invoice of invoices) {
+        const articlesData = await Listinvart.findAll({
+          where: { idInv: invoice.idInv },
+          attributes: [
+            [Sequelize.fn("sum", Sequelize.col("quantite")), "totalQuantite"],
+            [
+              Sequelize.fn("sum", Sequelize.literal("quantite * postPrixUnit")),
+              "totalTTC",
+            ],
+          ],
+          raw: true,
+          group: ["idInv"],
+        });
+  
+        // Ajouter le nombre d'articles et le total TTC à l'objet de la facture
+        invoice.dataValues.totalQuantite = articlesData[0]
+          ? articlesData[0].totalQuantite
+          : 0;
+        invoice.dataValues.totalTTC =
+          (articlesData[0] ? articlesData[0].totalTTC : 0) + invoice.tva;
+        invoice.dataValues.totalTVA = invoice.tva;
+      }
+  
+      // Envoyer la réponse
+      res.json(invoices);
+    } catch (error) {
+      console.error("Erreur lors de la recherche des factures :", error);
+      res.status(500).send(error);
+    }
+  }
+
+  // searchInvoices function in your backend
+  async searchInvoices(req, res) {
+    try {
+      const { company, type, etat, reference, startDate, endDate, fixedDate, societeName } = req.query;
+  
+      // Définir les clauses where et include
+      const whereClause = [];
+      const includeClause = [];
+  
+      if (company) {
+        whereClause.push({ major: company }); // 'major' est la clé étrangère de l'entreprise dans la table 'Invoice'
+      }
+      if (type) {
+        whereClause.push({ type: type });
+      }
+      if (etat) {
+        whereClause.push({ etat: etat });
+      }
+      if (reference) {
+        whereClause.push({ reference: reference });
+      }
+      if (fixedDate) {
+        whereClause.push({ dateCreation: fixedDate });
+      } else if (startDate && endDate) {
+        whereClause.push({
+          dateCreation: {
+            [Sequelize.Op.between]: [startDate, endDate]
+          }
+        });
+      } else if (startDate) {
+        whereClause.push({
+          dateCreation: {
+            [Sequelize.Op.gte]: startDate
+          }
+        });
+      } else if (endDate) {
+        whereClause.push({
+          dateCreation: {
+            [Sequelize.Op.lte]: endDate
+          }
+        });
+      }
+  
+      // Condition pour la recherche par nom de société
+      if (societeName) {
+        includeClause.push({
+          model: Societe,
+          as: 'societe',
+          attributes: ['nom'],
+          where: {
+            nom: {
+              [Sequelize.Op.like]: `%${societeName}%`
+            }
+          },
+          required: false, // Inclure les factures même si elles n'ont pas de correspondance dans 'Societe'
+        });
+  
+        // Inclure la condition de recherche dans 'autreSociete' directement dans whereClause
+        whereClause.push({
+          [Sequelize.Op.or]: [
+            { autreSociete: { [Sequelize.Op.like]: `%${societeName}%` } }
+          ]
+        });
+      } else {
+        includeClause.push({
+          model: Societe,
+          as: 'societe',
+          attributes: ['nom'],
+          required: false,
+        });
+      }
+  
+      // Obtenir les factures correspondantes
+      const invoices = await Invoice.findAll({
+        include: includeClause,
+        attributes: [
+          'idInv',
+          'reference',
+          [
+            Sequelize.literal(
+              '(case when (Invoice.idSociete=0) then 1 else Invoice.idSociete end)'
+            ),
+            'nc',
+          ],
+          'date',
+          'tva',
+          'paymentDate',
+          'paymentMode',
+          'autreSociete', // Inclure 'autreSociete' dans les attributs sélectionnés
+        ],
+        where: {
+          [Sequelize.Op.and]: whereClause // Utilisation des clauses where combinées
+        },
+        order: [['date', 'DESC']],
+      });
+  
+      // Pour chaque facture, obtenir les articles et calculer le nombre d'articles et le total TTC
+      for (const invoice of invoices) {
+        const articlesData = await Listinvart.findAll({
+          where: { idInv: invoice.idInv },
+          attributes: [
+            [Sequelize.fn("sum", Sequelize.col("quantite")), "totalQuantite"],
+            [
+              Sequelize.fn("sum", Sequelize.literal("quantite * postPrixUnit")),
+              "totalTTC",
+            ],
+          ],
+          raw: true,
+          group: ["idInv"],
+        });
+  
+        // Ajouter le nombre d'articles et le total TTC à l'objet de la facture
+        invoice.dataValues.totalQuantite = articlesData[0]
+          ? articlesData[0].totalQuantite
+          : 0;
+        invoice.dataValues.totalTTC =
+          (articlesData[0] ? articlesData[0].totalTTC : 0) + invoice.tva;
+        invoice.dataValues.totalTVA = invoice.tva;
+      }
+  
+      // Envoyer la réponse
+      res.json(invoices);
+    } catch (error) {
+      console.error('Erreur lors de la recherche des factures :', error);
+      res.status(500).send(error);
+    }
+  }
+  
+  
+  
+  
 
   async getInvoiceData1(req, res) {
     try {

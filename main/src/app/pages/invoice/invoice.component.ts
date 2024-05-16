@@ -34,6 +34,16 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
   selectedEntrepriseName: string = '';
   selectedEntrepriseId: number | null = null;
   selectedEntrepriseNom: string = '';
+  searchParams: any = {
+    company: '',
+    type: '',
+    etat: '',
+    reference: '',
+    startDate: '',
+    endDate: '',
+    fixedDate: '',
+    societeName: '' // Nouveau champ pour la recherche par nom de société
+  };
 
   invoiceTypes: string[] = [
     'Factures Payées',
@@ -73,8 +83,9 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
         // Gérez l'erreur ici, par exemple en affichant un message
       }
     });
-    this.loadAllInvoices();
+   // this.loadAllInvoices();
     this.loadEntreprises();
+    this.searchInvoices({});
   }
 
   ngOnDestroy(): void {
@@ -91,7 +102,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
 
   selectEntreprise(entreprise: Entreprise): void {
     this.selectedEntreprise = entreprise;
-    
+
   }
 
   onEnterpriseSelected() {
@@ -104,6 +115,24 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
     } else {
       console.error('Aucune entreprise sélectionnée.');
     }
+  }
+
+  searchInvoices(params: any): void {
+    this.invoiceService.searchInvoices(params).subscribe(
+      (data: any) => {
+        this.invoices = data;
+        this.allInvoices = this.invoices;
+        this.totalItems = this.invoices.length;
+        this.updatePage();
+      },
+      error => {
+        console.error('Failed to load invoices', error);
+      }
+    );
+  }
+
+  onSearch(params: any): void {
+    this.searchInvoices(params);
   }
 
   getRowClass: any;
@@ -143,7 +172,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
         return 'Impayé';
     }
   }
-  
+
 
   getColumnWidth(column: string): string {
     switch(column) {

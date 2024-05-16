@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { InvoicePreview, Societe } from './invoice.model';
@@ -75,7 +75,38 @@ export class InvoiceService {
   getInvoiceDataById(id: number): Observable<InvoicePreview> {
     return this.http.get<InvoicePreview>(`${this.apiUrl}/data/${id}`);
   }
+  searchInvoices(params: any): Observable<any> {
+    let httpParams = new HttpParams();
 
+    if (params.company) {
+      httpParams = httpParams.set('company', params.company);
+    }
+    if (params.type) {
+      httpParams = httpParams.set('type', params.type);
+    }
+    if (params.etat) {
+      httpParams = httpParams.set('etat', params.etat);
+    }
+    if (params.reference) {
+      httpParams = httpParams.set('reference', params.reference);
+    }
+    if (params.startDate) {
+      httpParams = httpParams.set('startDate', params.startDate);
+    }
+    if (params.endDate) {
+      httpParams = httpParams.set('endDate', params.endDate);
+    }
+    if (params.fixedDate) {
+      httpParams = httpParams.set('fixedDate', params.fixedDate);
+    }
+    if (params.societeName) {
+      httpParams = httpParams.set('societeName', params.societeName);
+    }
+
+    console.log('Paramètres de recherche envoyés :', params);
+    return this.http.get(`${this.apiUrl}/searchInvoices`, { params: httpParams });
+  }
+  
   createInvoice(invoiceData: any): Observable<any> {
     // Récupérer l'ID de l'utilisateur
 

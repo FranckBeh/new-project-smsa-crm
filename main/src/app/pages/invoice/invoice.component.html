@@ -1,14 +1,9 @@
 <div class="row">
-
-
   <!-- Content wrapper -->
   <div class="content-wrapper">
-
     <!-- Content -->
 
     <div class="container-xxl flex-grow-1 container-p-y">
-
-
       <h4 class="py-3 mb-4">
         <span class="text-muted fw-light">Facture /</span> List
       </h4>
@@ -18,9 +13,39 @@
       <div class="card mb-4">
         <div class="card-widget-separator-wrapper">
           <div class="card-body card-widget-separator">
+            <div
+              class="dt-action-buttons text-md-start mt-md-0 mb-3 d-flex align-items-center"
+            >
+              <span class="me-2 d-md-inline-block d-none text-primary">
+                <i class="fas fa-file-alt"></i>
+              </span>
+              <div class="d-md-inline-block d-none me-2">
+                Créer une facture :
+              </div>
+              <div class="dt-buttons btn-group flex-wrap">
+                <select
+                  class="form-select"
+                  [(ngModel)]="selectedEntreprise"
+                  (change)="onEnterpriseSelected()"
+                >
+                  <option value="" disabled selected>
+                    Choisissez une entreprise
+                  </option>
+                  <option
+                    *ngFor="let entreprise of entreprises"
+                    [value]="entreprise.idCompanie"
+                  >
+                    {{ entreprise.nomCompanie }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
             <div class="row gy-4 gy-sm-1">
               <div class="col-sm-6 col-md-6 col-lg-3">
-                <div class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0">
+                <div
+                  class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0"
+                >
                   <div>
                     <h3 class="mb-1">24</h3>
                     <p class="mb-0">Clients</p>
@@ -31,10 +56,12 @@
                     </span>
                   </div>
                 </div>
-                <hr class="d-none d-sm-block d-lg-none me-4">
+                <hr class="d-none d-sm-block d-lg-none me-4" />
               </div>
               <div class="col-sm-6 col-md-6 col-lg-3">
-                <div class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-3 pb-sm-0">
+                <div
+                  class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-3 pb-sm-0"
+                >
                   <div>
                     <h3 class="mb-1">165</h3>
                     <p class="mb-0">Invoices</p>
@@ -45,10 +72,12 @@
                     </span>
                   </div>
                 </div>
-                <hr class="d-none d-sm-block d-lg-none">
+                <hr class="d-none d-sm-block d-lg-none" />
               </div>
               <div class="col-sm-6 col-md-6 col-lg-3">
-                <div class="d-flex justify-content-between align-items-start border-end pb-3 pb-sm-0 card-widget-3">
+                <div
+                  class="d-flex justify-content-between align-items-start border-end pb-3 pb-sm-0 card-widget-3"
+                >
                   <div>
                     <h3 class="mb-1">$2.46k</h3>
                     <p class="mb-0">Paid</p>
@@ -81,151 +110,359 @@
       <!-- Invoice List Table -->
       <div class="card">
         <div class="card-datatable table-responsive">
-          <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+          <div
+            id="DataTables_Table_0_wrapper"
+            class="dataTables_wrapper dt-bootstrap5 no-footer"
+          >
             <div class="row mx-1">
-              <div
-                class="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
-                <div class="dataTables_length" id="DataTables_Table_0_length"><label><select
-                      name="DataTables_Table_0_length" aria-controls="" class="form-select">
-                      <option value="10">10</option>
-                      <option value="25">25</option>
-                      <option value="50">50</option>
-                      <option value="100">100</option>
-                    </select></label></div>
-                    <div class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start mt-md-0 mt-3">
-                      <div class="dt-buttons btn-group flex-wrap">
-
-                          <span><span class="d-md-inline-block d-none">Créer une facture :</span></span>
-
-                        <select class="form-select" [(ngModel)]="selectedEntreprise" (change)="onEnterpriseSelected()">
-                          <option value="" disabled selected>Choisissez une entreprise</option>
-                          <option *ngFor="let entreprise of entreprises" [value]="entreprise.idCompanie">{{ entreprise.nomCompanie }}</option>
+              <div>
+                <form (ngSubmit)="onSearch(searchParams)" class="w-100">
+                  <!-- Première ligne du formulaire -->
+                  <div class="col-12">
+                    <div class="mt-3 row align-items-center">
+                      <!-- Filtre par type -->
+                      <div class="col-md-4">
+                        <label for="type">Recherche par type</label>
+                        <select
+                          id="UserRole"
+                          class="form-select"
+                          [(ngModel)]="searchParams.type"
+                          name="type"
+                        >
+                          <option value="" disabled selected>
+                            Sélectionnez un type
+                          </option>
+                          <option value="1">Facture</option>
+                          <option value="0">Devis</option>
+                          <option value="2">Bon de livraison</option>
+                          <option value="3">Avoir</option>
+                          <option value="4">Bon de commande</option>
+                        </select>
+                      </div>
+                      <!-- Filtre par état -->
+                      <div class="col-md-4">
+                        <label for="etat">Recherche par état de facture</label>
+                        <select
+                          id="UserRole"
+                          class="form-select"
+                          [(ngModel)]="searchParams.etat"
+                          name="etat"
+                        >
+                          <option value="" disabled selected>
+                            Facture payée ou en créance
+                          </option>
+                          <option value="1">Payée</option>
+                          <option value="0">Créance</option>
+                        </select>
+                      </div>
+                      <!-- Filtre par entreprise gérée -->
+                      <div class="col-md-4">
+                        <label for="company"
+                          >Recherche par entreprise gérée</label
+                        >
+                        <select
+                          class="form-select"
+                          [(ngModel)]="searchParams.company"
+                          name="company"
+                          [ngModelOptions]="{ standalone: true }"
+                        >
+                          <option value="" disabled selected>
+                            Choisissez une entreprise
+                          </option>
+                          <option
+                            *ngFor="let entreprise of entreprises"
+                            [value]="entreprise.idCompanie"
+                          >
+                            {{ entreprise.nomCompanie }}
+                          </option>
                         </select>
                       </div>
                     </div>
+                  </div>
+                  <!-- Deuxième ligne du formulaire -->
+                  <div class="col-12 mt-md-0 mb-3">
+                    <div class="row align-items-center">
+                      <!-- Filtre par référence -->
+                      <div class="col-md-4">
+                        <label for="reference"
+                          >Recherche par référence de facture</label
+                        >
+                        <input
+                          type="text"
+                          [(ngModel)]="searchParams.reference"
+                          name="reference"
+                          class="form-control"
+                          placeholder="Référence"
+                        />
+                      </div>
+                     <!-- Filtre par date de création -->
+<div class="col-md-4">
+  <label for="dateCreation">Recherche par date de création</label>
+  <!-- Sélecteur pour choisir entre date fixe ou plage de dates -->
+  <select class="form-select" [(ngModel)]="searchParams.dateType" name="dateType">
+    <option value="fixed">Date fixe</option>
+    <option value="range">Plage de dates</option>
+  </select>
+  <!-- Div pour afficher le champ de date fixe -->
+  <div *ngIf="searchParams.dateType === 'fixed'">
+    <input type="date" [(ngModel)]="searchParams.fixedDate" name="fixedDate" class="form-control" placeholder="Date fixe">
+  </div>
+  <!-- Div pour afficher les champs de date de début et de fin pour la plage de dates -->
+  <div *ngIf="searchParams.dateType === 'range'">
+    <input type="date" [(ngModel)]="searchParams.startDate" name="startDate" class="form-control" placeholder="Date de début">
+    <input type="date" [(ngModel)]="searchParams.endDate" name="endDate" class="form-control" placeholder="Date de fin">
+  </div>
+</div>
 
-              </div>
-              <div
-                class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-3">
-                <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
-                      class="form-control" placeholder="Search Invoice" aria-controls=""></label>
-                </div>
-                <div class="invoice_status mb-3 mb-md-0">
-                  <select id="UserRole" class="form-select">
-                    <option value="">Select Status</option>
-                    <option *ngFor="let type of invoiceTypes" [value]="type" class="text-capitalize">{{ type }}</option>
-                  </select>
-                </div>
+                      <!-- Filtre par nom de société -->
+                      <div class="col-md-4">
+                        <label for="societeName"
+                          >Recherche par nom de société</label
+                        >
+                        <input
+                          type="text"
+                          [(ngModel)]="searchParams.societeName"
+                          name="societeName"
+                          class="form-control"
+                          placeholder="Nom de société"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Bouton de recherche -->
+                  <div class="col-12">
+                    <div class="row justify-content-end">
+                      <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">
+                          Rechercher
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
-            <table class="invoice-list-table table border-top dataTable no-footer dtr-column" id=""
-              aria-describedby="DataTables_Table_0_info" style="width: 1211px;">
+
+            <table
+              class="invoice-list-table table border-top dataTable no-footer dtr-column"
+              id=""
+              aria-describedby="DataTables_Table_0_info"
+              style="width: 1211px"
+            >
               <thead>
                 <tr>
-                  <th class="control sorting dtr-hidden" tabindex="0" aria-controls="" rowspan="1" colspan="1"
-                    style="width: 0px; display: none;" aria-label=": activate to sort column ascending">
-                  </th>
+                  <th
+                    class="control sorting dtr-hidden"
+                    tabindex="0"
+                    aria-controls=""
+                    rowspan="1"
+                    colspan="1"
+                    style="width: 0px; display: none"
+                    aria-label=": activate to sort column ascending"
+                  ></th>
                   <!-- Ajout des colonnes Réf., Société, NC, Date, Nbr articles, TVA, Total TTC, Date Pay., Mode Pay. -->
-                  <th *ngFor="let column of displayedColumns" [class]="getHeaderClass(column)" tabindex="0" aria-controls=""
-                    rowspan="1" colspan="1" [style.width]="getColumnWidth(column)"
-                    [attr.aria-label]="getHeaderLabel(column)" [attr.aria-sort]="getHeaderSort(column)">{{column}}</th>
-                    <th class="cell-fit sorting_disabled" rowspan="1" colspan="1" style="width: 76px;" aria-label="Actions">Actions</th>
+                  <th
+                    *ngFor="let column of displayedColumns"
+                    [class]="getHeaderClass(column)"
+                    tabindex="0"
+                    aria-controls=""
+                    rowspan="1"
+                    colspan="1"
+                    [style.width]="getColumnWidth(column)"
+                    [attr.aria-label]="getHeaderLabel(column)"
+                    [attr.aria-sort]="getHeaderSort(column)"
+                  >
+                    {{ column }}
+                  </th>
+                  <th
+                    class="cell-fit sorting_disabled"
+                    rowspan="1"
+                    colspan="1"
+                    style="width: 76px"
+                    aria-label="Actions"
+                  >
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
-
                 <tr *ngFor="let invoice of invoices">
                   <td>{{ invoice.reference }}</td>
-                  <td>{{ invoice.societe?.nom  || '--'}}</td>
-                  <td>{{ invoice.nc || '-' }}</td>
-                  <td>{{ invoice.date | date: 'mediumDate' }}</td>
-                  <td>{{ invoice.totalQuantite || '0' }}</td>
-                  <td>{{ invoice.totalTVA || '0.00' }}</td>
-                  <td>{{ invoice.totalTTC|| '0.00' }}</td>
-                  <td>{{ invoice.paymentDate | date: 'mediumDate' ||'--'}}</td>
-                  <td> {{ getPaymentModeText(invoice.paymentMode) || 'Impayé' }}</td>
-                  
+                  <td>
+                    {{ invoice.societe?.nom || invoice.autreSociete || "--" }}
+                  </td>
+                  <td>{{ invoice.nc || "-" }}</td>
+                  <td>{{ invoice.date | date : "mediumDate" }}</td>
+                  <td>{{ invoice.totalQuantite || "0" }}</td>
+                  <td>{{ invoice.totalTVA || "0.00" }}</td>
+                  <td>{{ invoice.totalTTC || "0.00" }}</td>
+                  <td>
+                    {{ invoice.paymentDate | date : "mediumDate" || "--" }}
+                  </td>
+                  <td>
+                    {{ getPaymentModeText(invoice.paymentMode) || "Impayé" }}
+                  </td>
+
                   <td>
                     <div class="d-flex align-items-center">
-                      <a href="javascript:;" data-bs-toggle="tooltip" class="text-body" data-bs-placement="top" aria-label="Send Mail"
-                        data-bs-original-title="Send Mail"><i class="bx bx-send mx-1"></i></a>
+                      <a
+                        href="javascript:;"
+                        data-bs-toggle="tooltip"
+                        class="text-body"
+                        data-bs-placement="top"
+                        aria-label="Send Mail"
+                        data-bs-original-title="Send Mail"
+                        ><i class="bx bx-send mx-1"></i
+                      ></a>
 
-                        <a [routerLink]="['/invoice/preview-facture', invoice.idInv]" data-bs-toggle="tooltip" class="text-body" data-bs-placement="top" aria-label="Prévisualiser la facture" data-bs-original-title="Prévisualiser la facture">
-                          <i class="bx bx-show mx-1"></i>
-                        </a>
-                        
+                      <a
+                        [routerLink]="[
+                          '/invoice/preview-facture',
+                          invoice.idInv
+                        ]"
+                        data-bs-toggle="tooltip"
+                        class="text-body"
+                        data-bs-placement="top"
+                        aria-label="Prévisualiser la facture"
+                        data-bs-original-title="Prévisualiser la facture"
+                      >
+                        <i class="bx bx-show mx-1"></i>
+                      </a>
+
                       <div class="dropdown">
-                        <a href="javascript:;" class="btn dropdown-toggle hide-arrow text-body p-0" data-bs-toggle="dropdown"><i
-                            class="bx bx-dots-vertical-rounded"></i></a>
+                        <a
+                          href="javascript:;"
+                          class="btn dropdown-toggle hide-arrow text-body p-0"
+                          data-bs-toggle="dropdown"
+                          ><i class="bx bx-dots-vertical-rounded"></i
+                        ></a>
                         <div class="dropdown-menu dropdown-menu-end">
-                          <a href="javascript:;" class="dropdown-item">Download</a>
-                          <a [routerLink]="['/invoice/edit-formulaire-facture', invoice.idInv]" class="dropdown-item">Edit</a>
-                          <a href="javascript:;" class="dropdown-item">Duplicate</a>
+                          <a href="javascript:;" class="dropdown-item"
+                            >Download</a
+                          >
+                          <a
+                            [routerLink]="[
+                              '/invoice/edit-formulaire-facture',
+                              invoice.idInv
+                            ]"
+                            class="dropdown-item"
+                            >Edit</a
+                          >
+                          <a href="javascript:;" class="dropdown-item"
+                            >Duplicate</a
+                          >
                           <div class="dropdown-divider"></div>
-                          <a href="javascript:;" class="dropdown-item delete-record text-danger">Delete</a>
+                          <a
+                            href="javascript:;"
+                            class="dropdown-item delete-record text-danger"
+                            >Delete</a
+                          >
                         </div>
                       </div>
                     </div>
                   </td>
                 </tr>
-
               </tbody>
             </table>
-<!-- Utilisez le style de pagination fourni -->
-<div class="row mx-2">
-  <div class="col-sm-12 col-md-6">
-    <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
-      Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ currentPage * pageSize }} of {{ totalItems }} entries
-    </div>
-  </div>
-  <div class="col-sm-12 col-md-6">
-    <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
-      <ul class="pagination">
-        <li class="paginate_button page-item previous" [class.disabled]="currentPage === 1" (click)="currentPage > 1 && onPageChange(currentPage - 1)">
-          <a class="page-link">Précédent</a>
-        </li>
+            <!-- Utilisez le style de pagination fourni -->
+            <div class="row mx-2">
+              <div class="col-sm-12 col-md-6">
+                <div
+                  class="dataTables_info"
+                  id="DataTables_Table_0_info"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Showing {{ (currentPage - 1) * pageSize + 1 }} to
+                  {{ currentPage * pageSize }} of {{ totalItems }} entries
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-6">
+                <div
+                  class="dataTables_paginate paging_simple_numbers"
+                  id="DataTables_Table_0_paginate"
+                >
+                  <ul class="pagination">
+                    <li
+                      class="paginate_button page-item previous"
+                      [class.disabled]="currentPage === 1"
+                      (click)="currentPage > 1 && onPageChange(currentPage - 1)"
+                    >
+                      <a class="page-link">Précédent</a>
+                    </li>
 
-        <!-- Toujours afficher le numéro de la première page -->
-        <li class="paginate_button page-item" [class.active]="currentPage === 1" (click)="onPageChange(1)">
-          <a class="page-link">1</a>
-        </li>
+                    <!-- Toujours afficher le numéro de la première page -->
+                    <li
+                      class="paginate_button page-item"
+                      [class.active]="currentPage === 1"
+                      (click)="onPageChange(1)"
+                    >
+                      <a class="page-link">1</a>
+                    </li>
 
-        <!-- Affichez les pointillés si la page actuelle est loin des premières pages -->
-        <li *ngIf="shouldShowFirstEllipsis()" class="paginate_button page-item">
-          <span class="page-link">...</span>
-        </li>
+                    <!-- Affichez les pointillés si la page actuelle est loin des premières pages -->
+                    <li
+                      *ngIf="shouldShowFirstEllipsis()"
+                      class="paginate_button page-item"
+                    >
+                      <span class="page-link">...</span>
+                    </li>
 
-        <!-- Affichez les pages autour de la page actuelle -->
-        <li class="paginate_button page-item" *ngFor="let page of getMiddlePages()" [class.active]="currentPage === page" (click)="onPageChange(page)">
-          <a class="page-link">{{ page }}</a>
-        </li>
+                    <!-- Affichez les pages autour de la page actuelle -->
+                    <li
+                      class="paginate_button page-item"
+                      *ngFor="let page of getMiddlePages()"
+                      [class.active]="currentPage === page"
+                      (click)="onPageChange(page)"
+                    >
+                      <a class="page-link">{{ page }}</a>
+                    </li>
 
-        <!-- Affichez les pointillés si la page actuelle est loin des dernières pages -->
-        <li *ngIf="shouldShowLastEllipsis()" class="paginate_button page-item">
-          <span class="page-link">...</span>
-        </li>
+                    <!-- Affichez les pointillés si la page actuelle est loin des dernières pages -->
+                    <li
+                      *ngIf="shouldShowLastEllipsis()"
+                      class="paginate_button page-item"
+                    >
+                      <span class="page-link">...</span>
+                    </li>
 
-        <!-- Affichez les dernières pages si nécessaire -->
-        <ng-container *ngIf="shouldShowLastPages()">
-          <li class="paginate_button page-item" *ngFor="let page of getPagesInRange(totalItems / pageSize - 4, totalItems / pageSize)" [class.active]="currentPage === page" (click)="onPageChange(page)">
-            <a class="page-link">{{ page }}</a>
-          </li>
-        </ng-container>
+                    <!-- Affichez les dernières pages si nécessaire -->
+                    <ng-container *ngIf="shouldShowLastPages()">
+                      <li
+                        class="paginate_button page-item"
+                        *ngFor="
+                          let page of getPagesInRange(
+                            totalItems / pageSize - 4,
+                            totalItems / pageSize
+                          )
+                        "
+                        [class.active]="currentPage === page"
+                        (click)="onPageChange(page)"
+                      >
+                        <a class="page-link">{{ page }}</a>
+                      </li>
+                    </ng-container>
 
-        <li class="paginate_button page-item next" [class.disabled]="currentPage === ceil(totalItems / pageSize)" (click)="currentPage < ceil(totalItems / pageSize) && onPageChange(currentPage + 1)">
-          <a class="page-link">Suivant</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-
+                    <li
+                      class="paginate_button page-item next"
+                      [class.disabled]="
+                        currentPage === ceil(totalItems / pageSize)
+                      "
+                      (click)="
+                        currentPage < ceil(totalItems / pageSize) &&
+                          onPageChange(currentPage + 1)
+                      "
+                    >
+                      <a class="page-link">Suivant</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-
     </div>
 
     <div class="content-backdrop fade"></div>
@@ -234,7 +471,6 @@
 </div>
 
 <div class="layout-overlay layout-menu-toggle"></div>
-
 
 <!-- Drag Target Area To SlideIn Menu On Small Screens -->
 <div class="drag-target"></div>

@@ -12,6 +12,7 @@ router.get('/last-id', InvoiceController.getLastId);
 router.get('/invoices', InvoiceController.getInvoiceList);
 router.get('/data/:id', InvoiceController.getInvoiceDataById);
 router.get('/data', InvoiceController.getInvoiceData);
+router.get('/searchInvoices',InvoiceController.searchInvoices);
 
 // CRUD pour les factures
 router.post('/createInvoice', InvoiceController.createInvoice);
