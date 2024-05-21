@@ -1,0 +1,8 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/crmsmsac/public_html/new-project-smsa-crm
+    - /bin/cp -R /home/crmsmsac/repositories/new-project-smsa-crm/main/* $DEPLOYPATH
+    - /bin/cp -R /home/crmsmsac/repositories/new-project-smsa-crm/backend/* $DEPLOYPATH/backend
+    - /usr/local/bin/npm install --production --prefix $DEPLOYPATH/backend
+    - /usr/local/bin/node $DEPLOYPATH/backend/index.js
