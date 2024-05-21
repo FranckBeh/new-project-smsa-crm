@@ -1,0 +1,46 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Liste des entreprises</h2>
+      <!-- Bouton pour créer une entreprise -->
+      <button class="btn btn-success mb-3" *ngIf="authService.isAdmin()" (click)="openCreateModal()">
+        Créer une entreprise
+      </button>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nom</th>
+            <th scope="col">Adresse</th>
+            <th scope="col">Téléphone</th>
+            <th scope="col">ICE</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entreprise of entreprises">
+            <th scope="row">{{ entreprise.idCompanie }}</th>
+            <td>{{ entreprise.nomCompanie }}</td>
+            <td>{{ entreprise.adresseCompanie }}</td>
+            <td>{{ entreprise.tel1Companie }}</td>
+            <td>{{ entreprise.ice }}</td>
+            <td>
+              <!-- Bouton pour afficher les détails -->
+              <button class="btn btn-sm btn-info" (click)="showDetails(entreprise)">
+                <i class="fas fa-eye"></i>
+              </button>
+              <!-- Bouton pour éditer -->
+              <button class="btn btn-sm btn-primary" *ngIf="authService.isAdmin()" (click)="editEntreprise(entreprise)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <!-- Bouton pour supprimer -->
+              <button class="btn btn-sm btn-danger" *ngIf="authService.isAdmin()" (click)="deleteEntreprise(entreprise)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

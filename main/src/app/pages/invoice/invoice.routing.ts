@@ -5,6 +5,7 @@ import { AppInvoiceComponent } from './invoice.component';
 import { FormulaireFactureComponent } from './formulaire-facture/formulaire-facture.component';
 import { EditFormulaireFactureComponent } from './edit-formulaire-facture/edit-formulaire-facture.component';
 import { PreviewFactureComponent } from './preview-facture/preview-facture/preview-facture.component';
+import { AuthGuard } from 'src/app/auth.guard';
 
 const routes: Routes = [
   {
@@ -12,8 +13,10 @@ const routes: Routes = [
     component: AppInvoiceComponent
   },
   {
+    canActivate: [AuthGuard],
     path: 'edit-formulaire-facture/:id',
     component: EditFormulaireFactureComponent,
+   
 },
   {
     path: 'formulaire-facture',

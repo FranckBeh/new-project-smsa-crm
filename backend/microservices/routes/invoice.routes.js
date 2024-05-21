@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const authenticate = require('../middlewares/authMiddleware');
+const authorize = require('../middlewares/authzMiddleware');
 const InvoiceController = require('./../controllers/InvoiceController');  // Votre contrôleur de factures
 
 // Mappage des routes aux fonctions du contrôleur
@@ -16,8 +18,8 @@ router.get('/searchInvoices',InvoiceController.searchInvoices);
 
 // CRUD pour les factures
 router.post('/createInvoice', InvoiceController.createInvoice);
-router.put('/edit/:id', InvoiceController.updateInvoice);
-router.delete('/delete/:id', InvoiceController.deleteInvoice);
+router.put('/edit/:id',authenticate, authorize('Administrateur'), InvoiceController.updateInvoice);
+router.delete('/delete/:id',authenticate, authorize('Administrateur'), InvoiceController.deleteInvoice);
 
 // Opérations de recherche avancées
 router.get('/invoices/export', InvoiceController.getExportInvoices);
@@ -37,6 +39,8 @@ router.delete('/invoices/:id/articles', InvoiceController.deleteAllArticles);
 router.delete('/invoices/:id/commentaires', InvoiceController.deleteAllCommentaires);
 
 // Paiement d'une facture
-router.put('/:id/pay', InvoiceController.pay);
-
+//router.put('/:id/pay', InvoiceController.validateInvoice);
+// Route pour valider une facture spécifique en utilisant PATCH
+//router.patch('/validate/:idInv', InvoiceController.validateInvoice);
+router.put('/:idInv/validate', InvoiceController.validateInvoiceById);
 module.exports = router;

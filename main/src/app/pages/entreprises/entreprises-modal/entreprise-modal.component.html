@@ -1,0 +1,72 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Modifier l\'entreprise' : 'Détails de l\'entreprise' }}</h2>
+<form *ngIf="isEditMode; else viewMode" [formGroup]="entrepriseForm" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content>
+    <mat-form-field appearance="fill">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="nomCompanie" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Adresse</mat-label>
+      <input matInput formControlName="adresseCompanie" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Tel 1</mat-label>
+      <input matInput formControlName="tel1Companie" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Tel 2</mat-label>
+      <input matInput formControlName="tel2Compnie" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Email 1</mat-label>
+      <input matInput formControlName="email1Compagnie" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Email 2</mat-label>
+      <input matInput formControlName="email2Compagnie" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Site web</mat-label>
+      <input matInput formControlName="sitewebCompagnie" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Registre de commerce</mat-label>
+      <input matInput formControlName="registreCommerce" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Patente</mat-label>
+      <input matInput formControlName="patente" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Identifiant fiscal</mat-label>
+      <input matInput formControlName="identifiantFiscal" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>ICE</mat-label>
+      <input matInput formControlName="ice" />
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button type="button" (click)="close()">Annuler</button>
+    <button mat-button type="submit" [disabled]="!entrepriseForm.valid">Enregistrer</button>
+  </div>
+</form>
+<ng-template #viewMode>
+  <div mat-dialog-content>
+    <p><strong><i class="fas fa-building"></i> Nom:</strong> {{ data.nomCompanie }}</p>
+    <p><strong><i class="fas fa-map-marker-alt"></i> Adresse:</strong> {{ data.adresseCompanie }}</p>
+    <p><strong><i class="fas fa-phone"></i> Tel 1:</strong> {{ data.tel1Companie }}</p>
+    <p><strong><i class="fas fa-phone"></i> Tel 2:</strong> {{ data.tel2Compnie }}</p>
+    <p><strong><i class="fas fa-envelope"></i> Email 1:</strong> {{ data.email1Compagnie }}</p>
+    <p><strong><i class="fas fa-envelope"></i> Email 2:</strong> {{ data.email2Compagnie }}</p>
+    <p><strong><i class="fas fa-globe"></i> Site web:</strong> {{ data.sitewebCompagnie }}</p>
+    <p><strong><i class="fas fa-file-alt"></i> Registre de commerce:</strong> {{ data.registreCommerce }}</p>
+    <p><strong><i class="fas fa-file-alt"></i> Patente:</strong> {{ data.patente }}</p>
+    <p><strong><i class="fas fa-file-alt"></i> Identifiant fiscal:</strong> {{ data.identifiantFiscal }}</p>
+    <p><strong><i class="fas fa-id-card"></i> ICE:</strong> {{ data.ice }}</p>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button type="button" (click)="close()">Fermer</button>
+    <button mat-button type="button" (click)="enableEditMode()">Modifier</button>
+  </div>
+</ng-template>

@@ -119,7 +119,7 @@ export interface InvoicePreview {
   type: number;
   etat: number
   isProFormat: boolean;
-  isValidated: boolean;
+  isValidated: number;
   nc: number;
   date: Date;
   tva: number;

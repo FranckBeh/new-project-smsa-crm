@@ -62,7 +62,7 @@ export class EditFormulaireFactureComponent implements OnInit {
     private invoiceService: InvoiceService,
     private route: ActivatedRoute,
     private entrepriseService: EntrepriseService,
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router, // Service pour interagir avec les données de facture
     private dialog: MatDialog
   ) {
@@ -163,7 +163,7 @@ if (tvaRate >= 19 && tvaRate <= 20) {
           totalHT: invoice.totalHT,
           totalTVA: invoice.tva,
           totalTTC: invoice.totalTTC,
-          nomEntreprise: invoice.nomEntreprise,
+          nomEntreprise: invoice.parametreCompanie.nomCompanie,
           idEntreprise: invoice.major
         }, //{ emitEvent: false }
       );
@@ -233,8 +233,8 @@ if (tvaRate >= 19 && tvaRate <= 20) {
       .getInvoiceDataById2(invoiceIdInv)
       .subscribe((invoiceData) => {
         this.editInvoiceForm = this.fb.group({
-          nomEntreprise: [invoiceData.nomEntreprise, Validators.required],
-          idEntreprise: [invoiceData.idEntreprise, Validators.required],
+          nomEntreprise: [invoiceData.parametreCompanie.nomCompanie, Validators.required],
+          idEntreprise: [invoiceData.major, Validators.required],
           invoiceState: [invoiceData.type, Validators.required],
           etatState: [invoiceData.etat],
           isProForma: [invoiceData.isProForma],
@@ -452,7 +452,8 @@ if (tvaRate >= 19 && tvaRate <= 20) {
 
 
   onSubmit(): void {
-    if (this.editInvoiceForm.valid) { // Assurez-vous que le formulaire est valide
+    if (this.authService.isAdmin()) {
+if (this.editInvoiceForm.valid) { // Assurez-vous que le formulaire est valide
       const formValue = this.editInvoiceForm.value;
 
       // Mise à jour des valeurs du formulaire pour les totaux
@@ -476,7 +477,7 @@ if (tvaRate >= 19 && tvaRate <= 20) {
         etat: formValue.etatState,
         isProFormat: formValue.isProForma,
         paymentMode: formValue.paymentMethod,
-        isValidated: formValue.paymentDate ? 1 : 0,
+        //isValidated: formValue.paymentDate ? 1 : 0,
         paymentComment: formValue.comment,
         paymentDate: formValue.paymentDate,
         date: formValue.creationDate,
@@ -526,6 +527,8 @@ if (tvaRate >= 19 && tvaRate <= 20) {
       console.error("Le formulaire n'est pas valide");
       // Gestion du formulaire invalide
     }
+    }else('Vous etes pas autorisé')
+    
   }
 
 

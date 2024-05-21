@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subscription } from 'rxjs';
 import { Entreprise } from '../entreprises/entreprises.model';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-invoice',
@@ -29,12 +30,12 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
   currentPage: number = 1;
   pageSize: number = 10;
   totalItems: number = 0;
-
   searchQuery: string = ''; // Initialisez searchQuery selon vos besoins
   selectedEntrepriseName: string = '';
   selectedEntrepriseId: number | null = null;
   selectedEntrepriseNom: string = '';
   searchParams: any = {
+    dateType: 'fixed', // Default value
     company: '',
     type: '',
     etat: '',
@@ -44,6 +45,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
     fixedDate: '',
     societeName: '' // Nouveau champ pour la recherche par nom de société
   };
+  isLoading = false; // Variable pour indiquer le chargement
 
   invoiceTypes: string[] = [
     'Factures Payées',
@@ -74,7 +76,8 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private entrepriseService: EntrepriseService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -84,8 +87,9 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
       }
     });
    // this.loadAllInvoices();
-    this.loadEntreprises();
-    this.searchInvoices({});
+   // this.loadEntreprises();
+   // this.searchInvoices({});
+   this.loadData();
   }
 
   ngOnDestroy(): void {
@@ -117,22 +121,53 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
     }
   }
 
-  searchInvoices(params: any): void {
-    this.invoiceService.searchInvoices(params).subscribe(
-      (data: any) => {
-        this.invoices = data;
-        this.allInvoices = this.invoices;
-        this.totalItems = this.invoices.length;
-        this.updatePage();
-      },
-      error => {
-        console.error('Failed to load invoices', error);
-      }
-    );
+
+
+  searchInvoices(params: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.invoiceService.searchInvoices(params).subscribe(
+        (data: any) => {
+          this.invoices = data;
+          this.allInvoices = this.invoices;
+          this.totalItems = this.invoices.length;
+          this.updatePage();
+          resolve();
+        },
+        error => {
+          console.error('Failed to load invoices', error);
+          this.isLoading = false;
+          reject(error);
+        }
+      );
+    });
+  }
+
+  loadData() {
+    this.isLoading = true;
+    Promise.all([this.loadEntreprises(), this.searchInvoices({})])
+      .then(() => {
+        this.isLoading = false;
+      })
+      .catch(error => {
+        console.error('Failed to load data', error);
+        this.isLoading = false;
+      });
   }
 
   onSearch(params: any): void {
-    this.searchInvoices(params);
+    this.isLoading = true;
+    this.searchInvoices(params).finally(() => {
+      this.isLoading = false;
+    });
+  }
+
+  onDateTypeChange() {
+    if (this.searchParams.dateType === 'fixed') {
+      this.searchParams.startDate = '';
+      this.searchParams.endDate = '';
+    } else if (this.searchParams.dateType === 'range') {
+      this.searchParams.fixedDate = '';
+    }
   }
 
   getRowClass: any;
@@ -321,17 +356,24 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
   }
 
   updateInvoice(invoice: Invoice): void {
+    if(this.authService.isAdmin()){
     this.selectedInvoice = invoice;
     this.isEditingInvoice = true;
+    }else ('Vous etes pas autorisé')
+
   }
 
   deleteInvoice(invoice: Invoice): void {
-    this.selectedInvoice = invoice;
+    if (this.authService.isAdmin()) {
+      this.selectedInvoice = invoice;
     this.isDeletingInvoice = true;
+    }else('Vous etes pas autorisé')
+  
   }
 
   confirmDeleteInvoice(): void {
-    if (this.selectedInvoice) {
+    if (this.authService.isAdmin()) {
+          if (this.selectedInvoice) {
       this.invoiceService.deleteInvoice(this.selectedInvoice.id).subscribe(
         () => {
           this.loadAllInvoices();
@@ -343,6 +385,8 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
         }
       );
     }
+    }else('Vous etes pas autorisé')
+
   }
 
   cancelDeleteInvoice(): void {

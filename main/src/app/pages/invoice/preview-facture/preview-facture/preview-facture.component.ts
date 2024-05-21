@@ -1,9 +1,12 @@
+import { AuthService } from './../../../auth/auth.service';
+import { Invoice } from './../../../../models/invoice.model';
 import { Alignment } from './../../../../../../node_modules/@types/pdfmake/interfaces.d';
 import { InvoiceService } from './../../invoice.service';
 import { InvoicePreview } from './../../invoice.model';
+import { MatDialog } from '@angular/material/dialog';
 // preview-facture.component.ts
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit ,ChangeDetectorRef} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import jsPDF, { jsPDFOptions } from 'jspdf';
 
 import html2canvas from 'html2canvas';
@@ -15,6 +18,8 @@ import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { formatDate } from '@angular/common';
 
 import { franc } from 'franc';
+import { DialogComponent } from 'src/app/layouts/dialog/dialog.component';
+
 
 
 
@@ -25,25 +30,77 @@ import { franc } from 'franc';
 })
 export class PreviewFactureComponent implements OnInit {
   invoice: InvoicePreview;
+  invoices: InvoicePreview[] = [];
   totalTTCInWords: string;
   totalTTCMessage: string;
   montantg: any;
-
+  idInv: number;
   constructor(
     private invoiceService: InvoiceService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router,
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef,
+    public authService: AuthService,
   ) {}
 
   ngOnInit(): void {
     const id = +this.route.snapshot.params['id'];
+    const idInv=+this.route.snapshot.params['id'];
     this.invoiceService.getInvoiceDataById(id).subscribe((data: InvoicePreview) => {
       this.invoice = data;
-      console.log('Invoice', this.invoice);
+      this.cdr.detectChanges();
+     // console.log('Invoice', this.invoice);
       this.montantg = this.invoice.totalTTC.toFixed(2);
       this.totalTTCInWords = this.convertToWords(this.invoice.totalTTC);
       this.totalTTCMessage = `A votre aimable règlement la somme de : ${this.invoice.totalTTC.toFixed(2)} DH (${this.totalTTCInWords})`;
     });
+
+  //  this.route.params.subscribe(params => {
+  //    this.idInv = params['idInv'];
+      // Utilisez l'ID comme nécessaire
+  //  });
   }
+
+
+  
+  validerFacture(idInv: number): void {
+    if (this.authService.isAdmin()) {
+      this.invoiceService.validateInvoice(idInv).subscribe({
+        next: (response) => {
+          console.log('Facture validée', response);
+          const invoice = this.invoices.find((inv: InvoicePreview) => inv.idInv === idInv);
+          if (invoice) {
+            invoice.isValidated = 1;
+          }
+  
+          this.dialog.open(DialogComponent, {
+            data: {
+              message: 'Facture Mise à jour avec succès'
+            }
+          });
+  
+  
+          window.location.reload();
+          this.router.navigate(['/invoice/preview-facture', idInv]);
+  
+        },
+        error: (error) => {
+          console.error('Erreur lors de la validation de la facture', error);
+          this.dialog.open(DialogComponent, {
+            data: {
+              message: 'Erreur lors de la modificiation de la facture'
+            }
+          });
+        }
+      });
+    }else{
+      alert('Vous etes pas autorisé')
+    }
+
+  }
+
+
 
   getPaymentModeText(paymentMode: number): string {
     switch (paymentMode) {
@@ -71,6 +128,25 @@ export class PreviewFactureComponent implements OnInit {
       default:
         return '';
     }
+  }
+
+  getValidate(isValidated: number): string {
+    if (isValidated) {
+      return 'Validé';
+    } else {
+      return 'Payée en attente';
+    }
+  }
+
+  getEtatWithIsValidated(isValidated: number, etat:number): string {
+    if (isValidated==1 && etat==1)
+      return 'Payée';
+    else if (isValidated==0 && etat==0)
+      return 'Créance';
+    else if (isValidated==0 && etat==1)
+      return 'Payée en attente';
+    else
+      return '';
   }
 
   getTypeText(type: number): string{

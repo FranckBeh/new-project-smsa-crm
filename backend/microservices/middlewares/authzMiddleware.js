@@ -19,12 +19,9 @@ function authorize(role) {
     }
 
     // Vérifier le rôle de l'utilisateur
-    if (role === 'Administrateur' && user.role !== 'Administrateur') {
-      console.log(`L'utilisateur ${user.login} n'est pas un administrateur`);
-      return res.status(403).json({ message: 'Accès interdit. Rôle administrateur requis' });
-    } else if (role === 'Concierge' && user.role !== 'Concierge') {
-      console.log(`L'utilisateur ${user.login} n'est pas un concierge`);
-      return res.status(403).json({ message: 'Accès interdit. Rôle concierge requis' });
+    if (role && user.role !== role) {
+      console.log(`L'utilisateur ${user.login} n'a pas le rôle requis: ${role}`);
+      return res.status(403).json({ message: `Accès interdit. Rôle ${role} requis` });
     }
 
     // Si toutes les vérifications réussissent, passer à la prochaine fonction du middleware

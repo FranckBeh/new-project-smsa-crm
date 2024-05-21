@@ -1,4 +1,5 @@
 export interface Entreprise {
+  isEditMode: boolean;
   idCompanie: number;
   nomCompanie: string;
   adresseCompanie: string | null;

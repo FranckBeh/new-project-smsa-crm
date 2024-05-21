@@ -1,4 +1,5 @@
 
+
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -42,11 +43,12 @@ export class FormulaireFactureComponent implements OnInit {
   detailsEntreprise: any;
 
   userId: string | null;
+  isValidated: number;
 
   constructor(private fb: FormBuilder,
     private invoiceService: InvoiceService,
     private entrepriseService: EntrepriseService,
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router,
     private dialog: MatDialog,
     private route: ActivatedRoute) {
@@ -272,34 +274,10 @@ displayFn(societe?: Societe): string {
     return this.articles.at(index)?.get(field) as FormControl;
   }
 
-  onSubmitOld() {
-
-
-
-    if (this.invoiceForm) {
-
-
-      // Obtenez tous les contrôles du formulaire avec leurs valeurs
-      const formControls = this.invoiceForm.value;
-
-      // Affichez les valeurs dans la console ou effectuez toute autre opération nécessaire
-      console.log('Contrôles du formulaire:', formControls);
-
-      // Vous pouvez accéder à chaque contrôle individuellement ainsi :
-      // const adresseEntrepriseValue = formControls['adresseEntreprise'].value;
-      // const invoiceStateValue = formControls['invoiceState'].value;
-      // et ainsi de suite...
-
-      // Soumettez le formulaire ou effectuez d'autres opérations nécessaires
-    } else {
-      // Affichez des messages d'erreur ou marquez les contrôles de formulaire comme touchés si le formulaire est invalide
-      this.markFormGroupTouched(this.invoiceForm);
-    }
-  }
 
   onSubmit() {
-    
-    const totalTTC = this.getTotalTTC1();
+
+  const totalTTC = this.getTotalTTC1();
 
   // Récupérez le total de TVA
   const totalTVA = this.getTotalTVA();
@@ -320,7 +298,13 @@ displayFn(societe?: Societe): string {
         autreQuantite: 1
       }));
 
-      const isValidated = formControls.paymentDate == null ? 0 : 1;
+      if(this.authService.isAdmin()){
+const isValidated = formControls.paymentDate == null ? 0 : 1;
+      }else{
+        const isValidated=0;
+      }
+
+      
 
 
       
@@ -331,7 +315,7 @@ displayFn(societe?: Societe): string {
         type: formControls.invoiceState,
         etat: formControls.etatState,
         isProFormat: formControls.isProForma,
-        isValidated: isValidated,
+        isValidated: this.isValidated,
         paymentMode: formControls.paymentMethod,
         paymentComment: formControls.comment,
         paymentDate: formControls.paymentDate,
@@ -390,7 +374,7 @@ displayFn(societe?: Societe): string {
         }
       });
     }
-    
+
     
   }
   

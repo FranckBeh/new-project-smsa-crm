@@ -1,4 +1,7 @@
 <div class="container" id="">
+  <a routerLink="/invoice" class="btn btn-outline-primary mb-3">
+    <i class="fa fa-arrow-left"></i> Retour
+  </a>
   <div class="row justify-content-center">
     <div class="col-md-8">
       <div class="card">
@@ -6,7 +9,8 @@
           <h3 class="mb-0">
             {{ getTypeText(invoice.type) }} / {{ invoice.reference }}
           </h3>
-          <h4 class="mb-0">{{ getEtatText(invoice.etat) }}</h4>
+          <h4 class="mb-0" *ngIf="invoice.type===1">{{ getEtatWithIsValidated(invoice.isValidated,invoice.etat) }}</h4>
+
         </div>
         <div class="card-body" id="pdf-content">
           <div class="row">
@@ -103,15 +107,39 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-md-6 text-center">
-             <a [routerLink]="['/invoice/edit-formulaire-facture', invoice.idInv]"  class="btn btn-primary mt-3 hide-pdf">Modifier</a>
-
+          <div class="row justify-content-center">
+            <!-- Section pour le bouton de modification -->
+            <div class="col-auto text-center" *ngIf="authService.isAdmin()">
+              <a
+                [routerLink]="['/invoice/edit-formulaire-facture', invoice.idInv]"
+                class="btn btn-primary mt-3 hide-pdf"
+              >
+                Modifier
+              </a>
             </div>
-            <div class="col-md-6 text-center">
-              <button class="btn btn-secondary mt-3 hide-pdf" (click)="exportToPDF()">Imprimer</button>
+          
+            <!-- Section pour le bouton d'impression -->
+            <div class="col-auto text-center">
+              <button
+                class="btn btn-secondary mt-3 hide-pdf"
+                (click)="exportToPDF()"
+              >
+                Imprimer
+              </button>
+            </div>
+          
+            <!-- Bouton pour valider la facture -->
+            <div class="col-auto text-center" *ngIf="authService.isAdmin()">
+              <button
+                *ngIf="invoice.type == 1 && invoice.etat == 1 && invoice.isValidated == 0"
+                class="btn btn-success mt-3"
+                (click)="validerFacture(invoice.idInv)"
+              >
+                Valider la Facture
+              </button>
             </div>
           </div>
+          
           <div class="card-footer text-muted text-center" id="pdf-footer">
             <p>
               <i class="fa fa-map-marker-alt"></i>

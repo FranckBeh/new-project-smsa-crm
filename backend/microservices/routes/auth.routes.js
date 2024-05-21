@@ -1,4 +1,3 @@
-// authRoutes.js
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -21,10 +20,10 @@ router.post('/login', async (req, res) => {
     }
 
     // Générer le JWT
-    const token = jwt.sign({ userId: user.IdUser }, process.env.JWT_SECRET, { expiresIn: '2h' });
+    const token = jwt.sign({ userId: user.IdUser, role: user.role }, process.env.JWT_SECRET, { expiresIn: '5h' });
 
     // Renvoyer le JWT
-    res.status(200).json({ token, userId: user.IdUser });
+    res.status(200).json({ token, userId: user.IdUser, userRole: user.role });
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la connexion' });
   }

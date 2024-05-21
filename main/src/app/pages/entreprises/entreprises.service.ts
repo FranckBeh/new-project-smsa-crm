@@ -26,8 +26,10 @@ export class EntrepriseService {
     );
   }
 
-  createEntreprise(entrepriseData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/create`, entrepriseData);
+  createEntreprise(entreprise: Entreprise): Observable<Entreprise> {
+    return this.http.post<Entreprise>(`${this.apiUrl}/create`, entreprise).pipe(
+      catchError(this.handleError)
+    );
   }
 
   getEntrepriseById(id: string): Observable<Entreprise> {
@@ -37,7 +39,22 @@ export class EntrepriseService {
   }
 
   changerEntreprise(entreprise: Entreprise | null) {
-    console.log('Objet entreprise émis :', entreprise);
+  //  console.log('Objet entreprise émis :', entreprise);
     this.entrepriseSource.next(entreprise);
   }
+  deleteEntreprise(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/delete/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+
+
+  updateEntreprise(id: number, entreprise: Entreprise): Observable<Entreprise> {
+    return this.http.put<Entreprise>(`${this.apiUrl}/edit/${id}`, entreprise).pipe(
+      catchError(this.handleError)
+    );
+  }
+  
+  
 }

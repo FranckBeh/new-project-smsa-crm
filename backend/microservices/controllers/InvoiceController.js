@@ -7,6 +7,7 @@ const { Op } = require("sequelize");
 const { QueryTypes } = require("sequelize");
 const { Sequelize } = require("sequelize");
 const sequelize = require("../../config/database.js");
+const { validationResult } = require('express-validator');
 require("../models/association");
 
 if (Invoice) {
@@ -133,7 +134,7 @@ class InvoiceController {
         whereClause.reference = reference;
       }
       if (dateCreation) {
-        whereClause.dateCreation = dateCreation;
+        whereClause.date = dateCreation;
       }
   
       // Obtenir les factures correspondantes
@@ -217,7 +218,7 @@ class InvoiceController {
         whereClause.push({ reference: reference });
       }
       if (fixedDate) {
-        whereClause.push({ dateCreation: fixedDate });
+        whereClause.push({ date: fixedDate });
       } else if (startDate && endDate) {
         whereClause.push({
           dateCreation: {
@@ -226,13 +227,13 @@ class InvoiceController {
         });
       } else if (startDate) {
         whereClause.push({
-          dateCreation: {
+          date: {
             [Sequelize.Op.gte]: startDate
           }
         });
       } else if (endDate) {
         whereClause.push({
-          dateCreation: {
+          date: {
             [Sequelize.Op.lte]: endDate
           }
         });
@@ -249,13 +250,13 @@ class InvoiceController {
               [Sequelize.Op.like]: `%${societeName}%`
             }
           },
-          required: false, // Inclure les factures même si elles n'ont pas de correspondance dans 'Societe'
+          required: false, // Inclure uniquement les factures avec une correspondance dans 'Societe'
         });
-  
-        // Inclure la condition de recherche dans 'autreSociete' directement dans whereClause
+      
         whereClause.push({
           [Sequelize.Op.or]: [
-            { autreSociete: { [Sequelize.Op.like]: `%${societeName}%` } }
+            { autreSociete: { [Sequelize.Op.like]: `%${societeName}%` } },
+            { '$societe.nom$': { [Sequelize.Op.like]: `%${societeName}%` } }
           ]
         });
       } else {
@@ -263,9 +264,11 @@ class InvoiceController {
           model: Societe,
           as: 'societe',
           attributes: ['nom'],
-          required: false,
+          required: false, // Inclure les factures même sans correspondance dans 'Societe'
         });
       }
+      
+      
   
       // Obtenir les factures correspondantes
       const invoices = await Invoice.findAll({
@@ -322,6 +325,38 @@ class InvoiceController {
       res.status(500).send(error);
     }
   }
+  
+
+ async validateInvoiceById(req, res) {
+  try {
+    console.log('Requête reçue avec les données suivantes:', req.body); // Affiche les données du corps de la requête
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { idInv } = req.params;
+    console.log('Validation de la facture avec idInv:', idInv); // Affiche l'ID de la facture
+
+    // Mettre à jour la facture spécifique avec isValided à 1 si etat est égal à 1
+    const result = await Invoice.update(
+      { isValidated: 1 },
+      { where: { idInv: idInv, etat: 1 } }
+    );
+
+    console.log('Résultat de la mise à jour:', result); // Affiche le résultat de la mise à jour
+
+    if (result[0] > 0) {
+      res.json({ message: 'La facture a été validée avec succès.' });
+    } else {
+      res.status(404).json({ message: 'Facture non trouvée ou déjà validée.' });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la validation de la facture :', error);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+}
   
   
   

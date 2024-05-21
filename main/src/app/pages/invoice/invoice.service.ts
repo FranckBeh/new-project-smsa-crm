@@ -106,7 +106,7 @@ export class InvoiceService {
     console.log('Paramètres de recherche envoyés :', params);
     return this.http.get(`${this.apiUrl}/searchInvoices`, { params: httpParams });
   }
-  
+
   createInvoice(invoiceData: any): Observable<any> {
     // Récupérer l'ID de l'utilisateur
 
@@ -198,11 +198,11 @@ export class InvoiceService {
     );
   }
 
-  pay(idInv: number): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${idInv}/pay`, {}).pipe(
-      catchError(this.handleError)
-    );
+  validateInvoice(idInv: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${idInv}/validate`, {});
   }
+
+
 
   getAllSocietes(): Observable<Societe[]> {
     return this.http.get<Societe[]>(this.apiUrlSociete);

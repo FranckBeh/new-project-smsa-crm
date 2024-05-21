@@ -129,7 +129,7 @@
                           [(ngModel)]="searchParams.type"
                           name="type"
                         >
-                          <option value="" disabled selected>
+                          <option value=""  selected>
                             Sélectionnez un type
                           </option>
                           <option value="1">Facture</option>
@@ -148,7 +148,7 @@
                           [(ngModel)]="searchParams.etat"
                           name="etat"
                         >
-                          <option value="" disabled selected>
+                          <option value=""  selected>
                             Facture payée ou en créance
                           </option>
                           <option value="1">Payée</option>
@@ -166,7 +166,7 @@
                           name="company"
                           [ngModelOptions]="{ standalone: true }"
                         >
-                          <option value="" disabled selected>
+                          <option value=""  selected>
                             Choisissez une entreprise
                           </option>
                           <option
@@ -196,23 +196,24 @@
                         />
                       </div>
                      <!-- Filtre par date de création -->
-<div class="col-md-4">
-  <label for="dateCreation">Recherche par date de création</label>
-  <!-- Sélecteur pour choisir entre date fixe ou plage de dates -->
-  <select class="form-select" [(ngModel)]="searchParams.dateType" name="dateType">
-    <option value="fixed">Date fixe</option>
-    <option value="range">Plage de dates</option>
-  </select>
-  <!-- Div pour afficher le champ de date fixe -->
-  <div *ngIf="searchParams.dateType === 'fixed'">
-    <input type="date" [(ngModel)]="searchParams.fixedDate" name="fixedDate" class="form-control" placeholder="Date fixe">
-  </div>
-  <!-- Div pour afficher les champs de date de début et de fin pour la plage de dates -->
-  <div *ngIf="searchParams.dateType === 'range'">
-    <input type="date" [(ngModel)]="searchParams.startDate" name="startDate" class="form-control" placeholder="Date de début">
-    <input type="date" [(ngModel)]="searchParams.endDate" name="endDate" class="form-control" placeholder="Date de fin">
-  </div>
-</div>
+                     <div class="col-md-4">
+                      <label for="dateCreation">Recherche par date de création</label>
+                      <!-- Sélecteur pour choisir entre date fixe ou plage de dates -->
+                      <select class="form-select" [(ngModel)]="searchParams.dateType" name="dateType" (change)="onDateTypeChange()">
+                        <option value="fixed">Date fixe</option>
+                        <option value="range">Plage de dates</option>
+                      </select>
+                      <!-- Div pour afficher le champ de date fixe -->
+                      <div *ngIf="searchParams.dateType === 'fixed'">
+                        <input type="date" [(ngModel)]="searchParams.fixedDate" name="fixedDate" class="form-control" placeholder="Date fixe">
+                      </div>
+                      <!-- Div pour afficher les champs de date de début et de fin pour la plage de dates -->
+                      <div *ngIf="searchParams.dateType === 'range'">
+                        <input type="date" [(ngModel)]="searchParams.startDate" name="startDate" class="form-control" placeholder="Date de début">
+                        <input type="date" [(ngModel)]="searchParams.endDate" name="endDate" class="form-control" placeholder="Date de fin">
+                      </div>
+                    </div>
+
 
                       <!-- Filtre par nom de société -->
                       <div class="col-md-4">
@@ -242,9 +243,12 @@
                 </form>
               </div>
             </div>
-
+            <div *ngIf="isLoading" class="loading-indicator">
+              <p>Chargement des données...</p>
+              <div class="spinner"></div>
+            </div>
             <table
-              class="invoice-list-table table border-top dataTable no-footer dtr-column"
+            *ngIf="!isLoading" class="invoice-list-table table border-top dataTable no-footer dtr-column"
               id=""
               aria-describedby="DataTables_Table_0_info"
               style="width: 1211px"
@@ -289,9 +293,10 @@
               <tbody>
                 <tr *ngFor="let invoice of invoices">
                   <td>{{ invoice.reference }}</td>
-                  <td>
-                    {{ invoice.societe?.nom || invoice.autreSociete || "--" }}
+                  <td *ngIf="invoice.nc !== 1" >
+                    {{ invoice.societe?.nom }}
                   </td>
+                  <td *ngIf="invoice.nc === 1">{{invoice.autreSociete}} </td>
                   <td>{{ invoice.nc || "-" }}</td>
                   <td>{{ invoice.date | date : "mediumDate" }}</td>
                   <td>{{ invoice.totalQuantite || "0" }}</td>
@@ -341,7 +346,7 @@
                           <a href="javascript:;" class="dropdown-item"
                             >Download</a
                           >
-                          <a
+                          <a *ngIf="authService.isAdmin()"
                             [routerLink]="[
                               '/invoice/edit-formulaire-facture',
                               invoice.idInv
@@ -353,7 +358,7 @@
                             >Duplicate</a
                           >
                           <div class="dropdown-divider"></div>
-                          <a
+                          <a *ngIf="authService.isAdmin()"
                             href="javascript:;"
                             class="dropdown-item delete-record text-danger"
                             >Delete</a

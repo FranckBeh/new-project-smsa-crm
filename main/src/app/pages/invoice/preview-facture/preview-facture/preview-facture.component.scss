@@ -117,6 +117,15 @@ body{
       .pdf-hide {
         display: none !important;
       }
+
+      .button-group .btn {
+        margin-right: 10px;
+      }
+      
+      .button-group .btn:last-child {
+        margin-right: 0;
+      }
+      
       
       
       
