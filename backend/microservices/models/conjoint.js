@@ -11,7 +11,8 @@ Conjoint.init({
   IdConjoint: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true
   },
   nom: {
     type: DataTypes.STRING(255),

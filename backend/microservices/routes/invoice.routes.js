@@ -28,7 +28,7 @@ router.get('/list-by', InvoiceController.getListBy);
 
 // Génération de références de factures
 router.get('/first-ref/:type/:year?', InvoiceController.getFirstAvailableRef);
-router.get('/last-ref/:type/:year?', InvoiceController.getLastAvailableRef);
+router.get('/last-ref/:type/:year/:idEntreprise', InvoiceController.getLastAvailableRef);
 
 // Gestion des articles et commentaires associés
 router.get('/invoices/:id/articles', InvoiceController.getArticles);
@@ -43,4 +43,9 @@ router.delete('/invoices/:id/commentaires', InvoiceController.deleteAllCommentai
 // Route pour valider une facture spécifique en utilisant PATCH
 //router.patch('/validate/:idInv', InvoiceController.validateInvoice);
 router.put('/:idInv/validate', InvoiceController.validateInvoiceById);
+
+// stat
+router.get('/invoice-stats', InvoiceController.getInvoiceStats);
+router.get('/client-invoice-stats', InvoiceController.getClientInvoiceStats);
+
 module.exports = router;

@@ -7,13 +7,13 @@ function authorize(role) {
     }
 
     // Vérifier si l'utilisateur est actif
-    if (user.active !== 1) {
+    if (user.active != 1) {
       console.log(`L'utilisateur ${user.login} est désactivé`);
       return res.status(403).json({ message: 'Accès interdit. Compte désactivé' });
     }
 
     // Vérifier si l'utilisateur est en ligne
-    if (user.online !== 1) {
+    if (user.online != 1) {
       console.log(`L'utilisateur ${user.login} est hors ligne`);
       return res.status(403).json({ message: 'Accès interdit. Utilisateur hors ligne' });
     }

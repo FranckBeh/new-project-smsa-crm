@@ -12,6 +12,7 @@ Enfant.init({
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
+    autoIncrement: true
   },
   nom: {
     type: DataTypes.STRING(255),

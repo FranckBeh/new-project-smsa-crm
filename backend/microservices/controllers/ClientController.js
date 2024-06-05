@@ -1,9 +1,12 @@
-
+const sequelize = require("../../config/database.js");
+const { Sequelize } = require('sequelize');
 const Societe = require('../models/societe'); 
 const TypeClient = require('../models/typeClient');
 const  Client  = require('../models/client');
+const Conjoint = require('../models/conjoint');
+const Enfant = require('../models/enfant');
 const { Op } = require('sequelize');
-const { Sequelize } = require('sequelize');
+
 const { Contact } = require('../models/contact');
 require('../models/association_clients');
 
@@ -11,6 +14,123 @@ const moment = require('moment');
 
 
 class ClientController {
+
+  async  getClientById(req, res, next) {
+    const clientId = req.params.id;
+  
+    try {
+      const client = await Client.findByPk(clientId, {
+        include: [
+          { model: Societe, as: 'societe' },
+          { model: TypeClient, as: 'typeclient' },
+          { model: Conjoint, as: 'conjoint' },
+          { model: Enfant, as: 'enfants' }
+        ]
+      });
+  
+      if (!client) {
+        return res.status(404).json({ error: 'Client non trouvé' });
+      }
+  
+      res.status(200).json(client);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createClientWithFamily(req, res, next) {
+    const { clientData, conjointData, enfantsData } = req.body;
+
+    try {
+      const result = await sequelize.transaction(async (transaction) => {
+        // Création du client
+        const newClient = await Client.create(clientData, { transaction });
+
+        // Création du conjoint s'il existe
+        const newConjoint = conjointData ? await Conjoint.create({ ...conjointData, IdClient: newClient.IdClient }, { transaction }) : null;
+
+        // Création des enfants s'il y en a
+        const newEnfants = enfantsData && enfantsData.length > 0
+          ? await Promise.all(enfantsData.map(enfantData => Enfant.create({ ...enfantData, IdClient: newClient.IdClient }, { transaction })))
+          : [];
+
+        return { newClient, newConjoint, newEnfants };
+      });
+
+      res.status(201).json({
+        client: result.newClient,
+        conjoint: result.newConjoint,
+        enfants: result.newEnfants
+      });
+    } catch (error) {
+      next(error); // Utiliser un gestionnaire d'erreurs centralisé
+    }
+  }
+
+  async  updateClientWithFamily(req, res, next) {
+    const clientId = req.params.id;
+    const { clientData, conjointData, enfantsData } = req.body;
+  
+    try {
+      const result = await sequelize.transaction(async (transaction) => {
+        const client = await Client.findByPk(clientId, { transaction });
+  
+        if (!client) {
+          return res.status(404).json({ error: 'Client non trouvé' });
+        }
+  
+        await client.update(clientData, { transaction });
+  
+        if (conjointData) {
+          const conjoint = await Conjoint.findOne({ where: { IdClient: clientId }, transaction });
+          if (conjoint) {
+            await conjoint.update(conjointData, { transaction });
+          } else {
+            await Conjoint.create({ ...conjointData, IdClient: clientId }, { transaction });
+          }
+        }
+  
+        if (enfantsData && enfantsData.length > 0) {
+          await Enfant.destroy({ where: { IdClient: clientId }, transaction }); // Suppression des anciens enfants
+          for (const enfantData of enfantsData) {
+            await Enfant.create({ ...enfantData, IdClient: clientId }, { transaction });
+          }
+        }
+  
+        return client;
+      });
+  
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+  
+  // Supprimer un client et ses associations
+  async  deleteClientWithFamily(req, res, next) {
+    const clientId = req.params.id;
+  
+    try {
+      const result = await sequelize.transaction(async (transaction) => {
+        const client = await Client.findByPk(clientId, { transaction });
+  
+        if (!client) {
+          return res.status(404).json({ error: 'Client non trouvé' });
+        }
+  
+        await Conjoint.destroy({ where: { IdClient: clientId }, transaction });
+        await Enfant.destroy({ where: { IdClient: clientId }, transaction });
+        await client.destroy({ transaction });
+  
+        return client;
+      });
+  
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
     async getClientCount(req, res) {
         try {
           // Compter le nombre total de clients
@@ -49,6 +169,55 @@ class ClientController {
     }
   }
 
+  async generateNewLogin(req, res) {
+    try {
+      // Récupérez le dernier login existant pour le type de client donné
+      const lastLogin = await Client.findOne({
+        attributes: ['login'],
+        where: { typeclient_id: req.params.id },
+        order: [['login', 'DESC']]
+      });
+  
+      if (!lastLogin) {
+        // Si aucun login existant, commencez avec 1
+        const newLogin = `client1`; // Remplacez par vos lettres
+        res.json(newLogin);
+      } else {
+        // Extrayez le chiffre du dernier login
+        const existingNumber = parseInt(lastLogin.login.match(/\d+/)[0], 10);
+  
+        // Ajoutez 1 au chiffre existant
+        const newNumber = existingNumber + 1;
+  
+        // Récupérez les lettres du login existant
+        const letters = lastLogin.login.match(/[a-zA-Z]+/)[0];
+  
+        // Concaténez les lettres et le nouveau chiffre
+        const newLogin = `${letters}${newNumber}`;
+        res.json(newLogin);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la génération du nouveau login :', error);
+      res.status(500).json({ error: 'Erreur serveur lors de la génération du login' });
+    }
+  }
+  async checkAvailableLogins(req, res) {
+    try {
+      const loginToCheck = req.params.login;
+      const existingUser = await Client.findOne({ where: { login: loginToCheck } });
+
+      if (existingUser) {
+        res.json({ available: false });
+      } else {
+        res.json({ available: true });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification du login :', error);
+      res.status(500).json({ error: 'Erreur serveur lors de la vérification du login' });
+    }
+  }
+  
+
   async getClientList(req, res) {
     try {
       const page = parseInt(req.query.page) || 0;
@@ -64,9 +233,10 @@ class ClientController {
             { model: Societe, as: 'societe', attributes: ['nom'] }
 
         ],
-        order: [['nom', 'ASC']],
+       
         limit: pageSize,
         offset: page * pageSize,
+        order: [['updatedAt', 'DESC']],
       });
   
       res.json({ totalClients: count, clients: rows });
@@ -113,7 +283,7 @@ class ClientController {
                 { model: TypeClient, as: 'typeclient', attributes: ['NomType'] },
                 { model: Societe, as: 'societe', attributes: ['nom'] }
             ],
-            order: [['nom', 'ASC']],
+            order: [['updatedAt', 'DESC']],
             limit: pageSize,
             offset: page * pageSize,
         });
@@ -127,7 +297,7 @@ class ClientController {
   
   
   
-  async getClientById(req, res) {
+  async getClientById2(req, res) {
     try {
         const id = req.params.id;
         const client = await Client.findOne({

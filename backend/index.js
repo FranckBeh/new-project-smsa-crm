@@ -13,8 +13,8 @@ const compagnieRouter =require('./microservices/routes/companie.routes.js');
 const authMiddleware = require('./microservices/middlewares/authMiddleware.js');
 const authzMiddleware = require('./microservices/middlewares/authzMiddleware.js');
 const authRoutes = require('./microservices/routes/auth.routes.js');
-
-
+const typeClientRouter = require('./microservices/routes/typeclient.routes');
+const errorHandler = require('./microservices/middlewares/errorHandler');
 // Chargement des variables d'environnement
 dotenv.config();
 
@@ -86,10 +86,12 @@ app.use('/user', utilisateurRouter);
 app.use('/societes', societeRouter);
 app.use('/cartesvisites', carteVisiteRouter);
 app.use('/companies', compagnieRouter);
+app.use('/typeClient', typeClientRouter);
 
 
 // ... (autres routes pour d'autres fonctionnalités)
-
+// Utilisation du gestionnaire d'erreurs
+app.use(errorHandler);
 // Graceful shutdown
 async function gracefulShutdown() {
   logger.info('Fermeture du serveur...');

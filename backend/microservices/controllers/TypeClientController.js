@@ -1,14 +1,15 @@
 const { Op } = require('sequelize');
-const { TypeClient } = require('../models/typeClient');
+const TypeClient  = require('../models/typeClient');
 
 class TypeClientController {
   // Récupérer tous les types de clients
   async getAll(req, res) {
     try {
       const typeClients = await TypeClient.findAll();
-      res.json(typeClients);
+      return res.status(200).json(typeClients);
     } catch (error) {
-      res.status(500).send(error);
+      console.error('Erreur lors de la récupération des types de clients :', error);
+      return res.status(500).json({ error: 'Erreur serveur' });
     }
   }
 

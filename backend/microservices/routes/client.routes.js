@@ -12,7 +12,10 @@ router.get('/clients/', ClientController.getClientList);
 router.get('/count', ClientController.getClientCount);
 router.get('/:id', ClientController.getClientById);
 router.get('/clients/search', ClientController.getClientByAttributesHandler.bind(ClientController));
-
+router.get('/checkLogin/:login', ClientController.checkAvailableLogins)
+router.post('/create', ClientController.createClientWithFamily);
+router.put('/update/:id', ClientController.updateClientWithFamily);
+router.delete('/delete/:id', ClientController.deleteClientWithFamily);
 
 
 // CRUD pour les clients
@@ -29,6 +32,9 @@ router.get('/clients/search', ClientController.getClientByAttributesHandler.bind
 router.get('/clients/:id/all-keywords', ClientController.generateClientAllKeyWords);
 router.get('/clients/:id/tendances', ClientController.getTendances);
 router.get('/clients/next-bp-login', ClientController.getNextBpLogin);
+router.get('/next-login/:id', ClientController.generateNewLogin);
+
+
 
 // Gestion des contacts, conjoints, enfants et autres associés
 router.get('/:id/contacts', ClientController.getContacts);

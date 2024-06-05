@@ -4,7 +4,7 @@ const UtilisateurController = require('./../controllers/UtilisateurController');
 
 // Obtenir tous les utilisateurs
 router.get('/', UtilisateurController.getAll);
-
+router.get('/liste', UtilisateurController.getAll);
 // Obtenir un utilisateur par ID
 router.get('/:id', UtilisateurController.getById);
 
@@ -12,10 +12,10 @@ router.get('/:id', UtilisateurController.getById);
 router.post('/create', UtilisateurController.create);
 
 // Mettre à jour un utilisateur
-router.put('/:id', UtilisateurController.update);
+router.put('/update/:id', UtilisateurController.update);
 
 // Supprimer un utilisateur
-router.delete('/:id', UtilisateurController.delete);
+router.delete('/delete/:id', UtilisateurController.delete);
 
 // Activer un utilisateur
 router.put('/activate/:id', UtilisateurController.activate);

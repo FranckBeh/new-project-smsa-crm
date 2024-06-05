@@ -14,7 +14,7 @@ Client.init({
     autoIncrement: true
   },
   nom: DataTypes.STRING(300),
-  typeclient_id: DataTypes.STRING(765),
+  typeclient_id: DataTypes.INTEGER,
   anniversaire: {
     type: DataTypes.DATE,
     defaultValue: new Date('1990-01-01 00:00:00')
@@ -29,8 +29,8 @@ Client.init({
   expiration: {
     type: DataTypes.DATE,
     allowNull: false,
-    defaultValue: new Date('2030-01-01 00:00:00')
-  },
+    defaultValue: new Date(new Date().getFullYear() + 1, 0, 1, 0, 0, 0)
+  },  
   inactif: {
     type: DataTypes.INTEGER,
     allowNull: false,

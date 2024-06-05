@@ -816,33 +816,30 @@ class InvoiceController {
   
   
 
-  async deleteInvoice(req, res) {
-    try {
-      // Trouver la facture à supprimer
-      const invoice = await Invoice.findByPk(req.params.id);
-
+  async  deleteInvoice(req, res) {
+    const result = await sequelize.transaction(async (t) => {
+      const invoice = await Invoice.findByPk(req.params.id, { transaction: t });
       if (!invoice) {
-        return res.status(404).send({ message: "Facture non trouvée" });
+        throw new Error('Facture non trouvée');
       }
-
-      // Supprimer les articles associés
-      const articles = await Listinvart.findAll({
+  
+      // Suppression des articles associés à la facture
+      await Listinvart.destroy({
         where: { idInv: invoice.idInv },
+        transaction: t
       });
-      for (let article of articles) {
-        await article.destroy();
-      }
-
-      // Supprimer la facture
-      await invoice.destroy();
-
-      // Envoyer la réponse
-      res.json({ message: "Facture supprimée avec succès" });
-    } catch (error) {
-      console.error("Error deleting invoice:", error);
-      res.status(500).send(error);
-    }
+  
+      // Suppression de la facture
+      await invoice.destroy({ transaction: t });
+    }).then(() => {
+      res.status(200).json({ message: 'Facture supprimée avec succès' });
+    }).catch((error) => {
+      console.error('Erreur lors de la suppression de la facture:', error);
+      res.status(500).json({ message: 'Erreur lors de la suppression de la facture', error });
+    });
   }
+  
+  
 
   async getExportInvoices(type, dateFrom, dateTo) {
     try {
@@ -973,7 +970,8 @@ class InvoiceController {
       const year = req.params.year
         ? parseInt(req.params.year)
         : new Date().getFullYear();
-
+      const idEntreprise = req.params.idEntreprise; // Nouveau paramètre
+  
       const lastInvoice = await Invoice.findOne({
         attributes: [
           [
@@ -990,13 +988,14 @@ class InvoiceController {
           date: {
             [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
           },
+          major: idEntreprise, // Utilisation du nouveau paramètre
         },
         raw: true,
       });
-
+  
       // Calculer la prochaine référence disponible
       const nextRef = lastInvoice.lastRef ? lastInvoice.lastRef + 1 : 1;
-
+  
       res.json(nextRef);
     } catch (error) {
       console.error(
@@ -1011,6 +1010,8 @@ class InvoiceController {
         });
     }
   }
+  
+  
 
   async getArticles(id) {
     try {
@@ -1161,6 +1162,110 @@ class InvoiceController {
       type: QueryTypes.DELETE,
     });
     return result;
+  }
+
+  //stat
+
+  async getInvoiceStats(req, res) {
+    try {
+      let yearFilter = {};
+      if (req.query.year) {
+          const year = parseInt(req.query.year);
+          const startOfYear = new Date(year, 0, 1);
+          const endOfYear = new Date(year + 1, 0, 1);
+          yearFilter = {
+              date: {
+                  [Op.between]: [startOfYear, endOfYear]
+              }
+          };
+      }
+  
+      // Factures en créance
+      const creanceCount = await Invoice.count({
+        where: {
+            ...yearFilter,
+            type: 1,
+            etat: 0
+        }
+    });
+  
+      // Factures en attente de validation
+      const pendingValidationCount = await Invoice.count({
+        where: {
+          ...yearFilter,
+          type: 1,
+          etat: 1,
+          isValidated: 0
+        }
+      });
+  
+      // Factures payées et validées
+      const paidValidatedCount = await Invoice.count({
+        where: {
+          ...yearFilter,
+          type: 1,
+          etat: 1,
+          isValidated: 1
+        }
+      });
+  
+      res.json({
+        creanceCount,
+        pendingValidationCount,
+        paidValidatedCount
+      });
+    } catch (error) {
+      console.error("Error getting invoice stats:", error);
+      res.status(500).send(error);
+    }
+  }
+
+ async getClientInvoiceStats (req, res) {
+    try {
+      let yearFilter = {};
+        if (req.query.year) {
+            const year = parseInt(req.query.year);
+            const startOfYear = new Date(year, 0, 1);
+            const endOfYear = new Date(year + 1, 0, 1);
+            yearFilter = {
+                date: {
+                    [Op.between]: [startOfYear, endOfYear]
+                }
+            };
+        }
+      // Obtenir le nombre de clients enregistrés uniques pour lesquels des factures ont été émises
+      const registeredClients = await Invoice.findAll({
+        where: {
+          ...yearFilter,
+          idSociete: {
+            [Op.ne]: 0 // idSociete non nul (clients enregistrés)
+          }
+        },
+        attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('idSociete')), 'idSociete']],
+      });
+      const registeredClientCount = registeredClients.length;
+  
+      // Obtenir le nombre de clients non enregistrés uniques pour lesquels des factures ont été émises
+      const unregisteredClients = await Invoice.findAll({
+        where: {
+          ...yearFilter,
+          autreSociete: {
+            [Op.ne]: '' // autreSociete non vide (clients non enregistrés)
+          }
+        },
+        attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('autreSociete')), 'autreSociete']],
+      });
+      const unregisteredClientCount = unregisteredClients.length;
+  
+      res.json({
+        registeredClientCount,
+        unregisteredClientCount,
+        totalClientCount: registeredClientCount + unregisteredClientCount
+      });
+    } catch (error) {
+      console.error('Error getting client invoice stats:', error);
+      res.status(500).send(error);
+    }
   }
 }
 

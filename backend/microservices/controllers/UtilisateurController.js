@@ -38,12 +38,28 @@ class UtilisateurController {
   // Obtenir tous les utilisateurs
   async getAll(req, res) {
     try {
-      const utilisateurs = await Utilisateur.findAll();
-      res.status(200).json(utilisateurs);
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows } = await Utilisateur.findAndCountAll({
+        offset: offset,
+        limit: limit,
+      });
+
+      const totalPages = Math.ceil(count / limit);
+
+      res.status(200).json({
+        totalPages: totalPages,
+        currentPage: page,
+        utilisateurs: rows,
+      });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
-  }
+}
+
+  
 
   // Obtenir un utilisateur par ID
   async getById(req, res) {
@@ -58,12 +74,30 @@ class UtilisateurController {
   // Mettre à jour un utilisateur
   async update(req, res) {
     try {
-      await Utilisateur.update(req.body, { where: { IdUser: req.params.id } });
-      res.status(200).json({ message: 'Utilisateur mis à jour' });
+        // Récupérer les données de la requête
+        const { login, email, tel, prenom, nom, role, password, online, active } = req.body;
+
+        // Vérifier si un nouveau mot de passe est fourni
+        let updatedData = { login, email, tel, prenom, nom, role, online, active };
+        if (password) {
+            // Hasher le nouveau mot de passe
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updatedData.password = hashedPassword;
+        } else {
+            // Si aucun nouveau mot de passe n'est fourni, ne pas inclure le mot de passe dans les données mises à jour
+            delete updatedData.password;
+        }
+
+        // Mettre à jour l'utilisateur avec les données mises à jour
+        await Utilisateur.update(updatedData, { where: { IdUser: req.params.id } });
+
+        res.status(200).json({ message: 'Utilisateur mis à jour' });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
-  }
+}
+
+
 
   // Supprimer un utilisateur
   async delete(req, res) {
