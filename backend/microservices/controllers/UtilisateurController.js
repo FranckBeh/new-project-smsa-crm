@@ -35,6 +35,15 @@ class UtilisateurController {
     }
   }
 
+  async getAllUser(req, res) {
+    try {
+        const utilisateurs = await Utilisateur.findAll();
+        res.json(utilisateurs);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching utilisateur' });
+    }
+}
+
   // Obtenir tous les utilisateurs
   async getAll(req, res) {
     try {

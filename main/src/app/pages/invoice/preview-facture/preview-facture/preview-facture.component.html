@@ -138,6 +138,14 @@
                 Valider la Facture
               </button>
             </div>
+            <div class="col-auto text-center" *ngIf="invoice.type == 1 && invoice.etat == 0 && invoice.isValidated == 0">
+              <button
+                class="btn btn-success mt-3"
+                (click)="validerEnAttente(invoice.idInv)"
+              >
+                Valider en attente
+              </button>
+            </div>
           </div>
           
           <div class="card-footer text-muted text-center" id="pdf-footer">

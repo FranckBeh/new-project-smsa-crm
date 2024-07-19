@@ -1,0 +1,50 @@
+$light-brown: #D2B48C;
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card-header {
+  background-color: $light-brown;
+  color: white;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.mat-paginator {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #343a40;
+  color: white;
+}
+
+.nav-tabs .nav-link {
+  color: #343a40;
+}
+
+.btn-outline-primary {
+  border-color: #D2B48C;
+  color: #D2B48C;
+}
+
+.btn-outline-primary:hover {
+  background-color: #D2B48C;
+  color: white;
+}
+
+.btn-primary {
+  background-color: #D2B48C;
+  border-color: #D2B48C;
+}
+
+.btn-primary:hover {
+  background-color: darken(#D2B48C, 10%);
+  border-color: darken(#D2B48C, 10%);
+}

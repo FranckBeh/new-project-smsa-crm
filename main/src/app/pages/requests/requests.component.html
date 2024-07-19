@@ -1,1 +1,111 @@
-<p>requests works!</p>
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <input type="text" class="form-control" placeholder="Rechercher" [(ngModel)]="searchQuery" (input)="search()">
+    </div>
+    <div class="col-md-6 text-right">
+      <button class="btn btn-outline-primary" (click)="export()">Exporter</button>
+      <a class="btn btn-primary" [routerLink]="['/requests/add-requests/formulaire-requests']">
+        <i class="bx bx-plus me-md-1"></i>
+        <span class="d-md-inline-block d-none">Ajouter un prestataire</span>
+      </a>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'current'" (click)="changeTab('current')">Requêtes en cours</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'finalized'" (click)="changeTab('finalized')">Requêtes traitées</a>
+    </li>
+  </ul>
+
+  <div class="card mb-4" *ngIf="activeTab === 'current'">
+    <div class="card-header bg-light-brown text-white">
+      Liste des requêtes en cours
+    </div>
+    <div class="card-body">
+      <div *ngIf="loadingCurrent" class="text-center text-muted">
+        Chargement en cours...
+      </div>
+      <table class="table table-striped" *ngIf="!loadingCurrent">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Société</th>
+            <th>Attribuée à</th>
+            <th>Contexte</th>
+            <th>Domaine</th>
+            <th>Priorité</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of currentRequests">
+            <td>{{ request.dateNote | date }}</td>
+            <td>{{ request.client?.nom || '-' }}</td>
+            <td>{{ request.societe?.nom }}</td>
+            <td>{{ request.utilisateur?.login }}</td>
+            <td>{{ request.context }}</td>
+            <td>{{ request.domaineActivite?.nom }}</td>
+            <td>{{ request.priorite }}</td>
+            <td>
+              <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
+              <button class="btn btn-secondary btn-sm"><i class="fas fa-file-alt"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Paginator pour les requêtes en cours -->
+      <mat-paginator #currentPaginator [length]="totalItemsCurrent" [pageSize]="pageSize" (page)="pageChanged($event, 'current')">
+      </mat-paginator>
+    </div>
+  </div>
+
+  <div class="card mb-4" *ngIf="activeTab === 'finalized'">
+    <div class="card-header bg-light-brown text-white">
+      Liste des requêtes traitées
+    </div>
+    <div class="card-body">
+      <div *ngIf="loadingFinalized" class="text-center text-muted">
+        Chargement en cours...
+      </div>
+      <table class="table table-striped" *ngIf="!loadingFinalized">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Société</th>
+            <th>Attribuée à</th>
+            <th>Contexte</th>
+            <th>Domaine</th>
+            <th>Priorité</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of finalizedRequests">
+            <td>{{ request.dateNote | date }}</td>
+            <td>{{ request.client?.nom || '-' }}</td>
+            <td>{{ request.societe?.nom }}</td>
+            <td>{{ request.utilisateur?.login }}</td>
+            <td>{{ request.context }}</td>
+            <td>{{ request.domaineActivite?.nom }}</td>
+            <td>{{ request.priorite }}</td>
+            <td>
+              <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
+              <button class="btn btn-secondary btn-sm"><i class="fas fa-file-alt"></i></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Paginator pour les requêtes traitées -->
+      <mat-paginator #finalizedPaginator [length]="totalItemsFinalized" [pageSize]="pageSize" (page)="pageChanged($event, 'finalized')">
+      </mat-paginator>
+    </div>
+  </div>
+</div>

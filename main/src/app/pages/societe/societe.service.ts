@@ -3,12 +3,16 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Societe } from './societe.model';
+import { environment } from 'src/app/environment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocieteService {
-  private  apiUrlSociete= 'http://localhost:3000/societes'; // L'URL de societe
+ private  apiUrlSociete= environment.apiUrl + 'societes'; // L'URL de societe
+
+ // private apiUrlSociete = 'https://api.crm-smsa.com/societes' ;
+
   private errorSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
   private societesSubject: BehaviorSubject<Societe[]> = new BehaviorSubject<Societe[]>([]);
   public societes$: Observable<Societe[]> = this.societesSubject.asObservable();
@@ -32,10 +36,14 @@ export class SocieteService {
     );
   }
 
-  getSociete(page: number, pageSize: number): Observable<any> {
-    const params = new HttpParams()
+  getSociete(page: number, pageSize: number, search?: string): Observable<any> {
+    let params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
+
+    if (search) {
+      params = params.set('search', search);
+    }
 
     return this.http.get<any>(`${this.apiUrlSociete}/list`, { params });
   }
@@ -45,10 +53,21 @@ export class SocieteService {
     return throwError('Something went wrong; please try again later.');
   }
 
-  deleteSociete(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrlSociete}/${id}`).pipe(
+  createSociete(societe: Societe): Observable<Societe> {
+    return this.http.post<any>(`${this.apiUrlSociete}/create`, societe).pipe(
       catchError(this.handleError)
     );
   }
 
+  updateSociete(idSociete: number, societe: Societe): Observable<Societe> {
+    return this.http.put<Societe>(`${this.apiUrlSociete}/update/${idSociete}`, societe).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  deleteSociete(idSociete: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrlSociete}/delete/${idSociete}`).pipe(
+      catchError(this.handleError)
+    );
+  }
 }

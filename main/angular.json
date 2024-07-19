@@ -22,6 +22,28 @@
             "main": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
+            "allowedCommonJsDependencies": [
+              "html2canvas",
+              "core-js/modules/es.array.index-of.js",
+              "core-js/modules/es.array.iterator.js",
+              "core-js/modules/es.array.reduce.js",
+              "core-js/modules/es.array.reverse.js",
+              "core-js/modules/es.promise.js",
+              "core-js/modules/es.regexp.to-string.js",
+              "core-js/modules/es.string.ends-with.js",
+              "core-js/modules/es.string.includes.js",
+              "core-js/modules/es.string.match.js",
+              "core-js/modules/es.string.replace.js",
+              "core-js/modules/es.string.split.js",
+              "core-js/modules/es.string.starts-with.js",
+              "core-js/modules/es.string.trim.js",
+              "core-js/modules/web.dom-collections.iterator.js",
+              "raf",
+              "rgbcolor",
+              "apexcharts",
+              "html2pdf.js",
+              "pdfmake/build/pdfmake"
+           ],
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
@@ -59,7 +81,6 @@
               "src/assets/vendor/libs/bootstrap-select/bootstrap-select.js",
               "src/assets/vendor/libs/select2/select2.js",
               "src/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js",
-              "src/assets/js/main2.js",
               "src/assets/js/main.js",
               "src/assets/js/app-invoice-list.js",
               "src/assets/js/app-user-list.js",
@@ -73,13 +94,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "12mb",
-                  "maximumError": "12mb"
+                  "maximumWarning": "46mb",
+                  "maximumError": "46mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "12mb",
-                  "maximumError": "12mb"
+                  "maximumWarning": "46mb",
+                  "maximumError": "46mb"
                 }
               ],
               "outputHashing": "all"

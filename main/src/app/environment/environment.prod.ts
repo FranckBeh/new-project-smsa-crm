@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://monapi.com/api'
+  apiUrl: 'https://api.crm-smsa.com/'
 };

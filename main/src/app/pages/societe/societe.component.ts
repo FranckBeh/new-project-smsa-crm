@@ -40,7 +40,7 @@ export class AppSocieteComponent implements OnInit  {
     const dialogRef = this.dialog.open(FormulaireSocieteComponent, {
       width: '250px',
       // Vous pouvez passer des données au formulaire modal ici
-      data: { }
+      
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -56,22 +56,26 @@ export class AppSocieteComponent implements OnInit  {
   }
 
 
-  getSocieteList(): void {
+  getSocieteList(search?: string): void {
     this.isLoading = true;
-    this.SocieteService.getSociete(this.currentPage, this.itemsPerPage).pipe(
+    this.SocieteService.getSociete(this.currentPage, this.itemsPerPage, search).pipe(
       catchError(error => {
         console.error('Error retrieving societes:', error);
-        this.errorMessage = error.message;
         this.isLoading = false;
         return EMPTY;
       })
     ).subscribe((response: { totalSocietes: number; societes: any; }) => {
       this.totalSocietes = response.totalSocietes;
-      this.societes$ = of(response.societes); // Utilisez l'opérateur 'of' pour convertir les données réelles en Observable
+      this.societes$ = of(response.societes);
       this.isLoading = false;
     });
   }
-
+  searchSocietes(event: Event): void {
+    const searchTerm = (event.target as HTMLInputElement).value;
+    // Appelez getSocieteList avec le terme de recherche
+ //   this.currentPage = 1;
+    this.getSocieteList(searchTerm);
+  }
 
 
   search(): void {
@@ -79,31 +83,35 @@ export class AppSocieteComponent implements OnInit  {
     this.getSocieteList(); // Appelez getClientList() au lieu de getClients()
   }
 
-  deleteSociete(id: number): void {
+  deleteSociete(idSociete: number): void {
     if (confirm('Are you sure you want to delete this societe?')) {
-      this.SocieteService.deleteSociete(id).subscribe(() => {
+      this.SocieteService.deleteSociete(idSociete).subscribe(() => {
         this.getSocieteList();
       });
     }
   }
 
   exportClients(): void {
-    console.log('Exporting societes...');
+
   }
 
   viewSociete(societe: Societe): void {
-    console.log('Viewing societe:', societe);
+
   }
 
   editSociete(societe: Societe): void {
-    console.log('Editing societe:', societe);
+    // Implémentez la logique pour éditer la société (par exemple, ouvrez un dialogue modal avec le formulaire de modification)
+    const dialogRef = this.dialog.open(FormulaireSocieteComponent, {
+      width: '250px',
+      data: societe // Passez les données de la société à modifier
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Le formulaire modal a été fermé après modification');
+      // Vous pouvez traiter le résultat ici (par exemple, mettre à jour la liste des sociétés)
+      this.getSocieteList();
+    });
   }
 
-  changeTab(tabName: string): void {
-    console.log('Changing tab to:', tabName);
-  }
-}
-function getSocieteCount(): number {
-  throw new Error('Function not implemented.');
 }
 

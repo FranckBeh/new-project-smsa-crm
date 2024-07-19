@@ -3,6 +3,7 @@ export interface Clients {
   nom: string;
   prenom: string;
   typeclient:{
+    NumType: number;
     NomType: string;
   };
   fixePerso: string;
@@ -10,12 +11,26 @@ export interface Clients {
   mailPerso: string;
   mailPro: string;
   societe:{
+    idSociete: number;
     nom: string;
   };
   login: string;
   expiration: Date;
   fonction: string;
   inactif: number;
+  typeclient_id: number;
+  gsmPerso: string;
+  gsmPro: string;
+  societe_id: number;
+  situation: string;
+  civilite: string;
+  conjoint: Conjoint;
+  enfants: Array <{
+    nom: string;
+    anniversaire: Date;
+  }>;
+  nbrEnfant: boolean;
+
 }
 
 
@@ -42,4 +57,30 @@ export interface ClientsResponse {
 }
 
 
+export interface TypeClient {
+  NumType: number;
+  NomType: string;
+  abreviation?: string; // '?' marque ce champ comme optionnel
+}
 
+export interface Conjoint{
+  nom: string;
+  gsmPro: string; //
+  anniversaire: Date
+  mail: string; //
+  gsmPerso:string; //,
+
+}
+
+
+export interface Enfant{
+  nom: string;
+  anniversaire: Date;
+
+}
+
+export interface ClientPayload {
+  clientData: Clients;
+  conjointData?: Conjoint;
+  enfantsData?: Enfant[];
+}

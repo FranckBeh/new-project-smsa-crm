@@ -1,0 +1,175 @@
+<div class="container mt-4">
+  <a routerLink="/prestataires" class="btn btn-outline-primary mb-3" style="color: #dcc36b; border-color: #dcc36b;">
+    <i class="fa fa-arrow-left"></i> Retour
+  </a>
+  <div class="card">
+    <!-- En-tête de la carte avec fond marron et titre en majuscules -->
+    <div class="card-header text-white" style="background-color: #5D4037;">
+      <h5 class="card-title text-uppercase">
+        <i class="fas fa-building"></i> {{ prestataire.nom }}
+      </h5>
+    </div>
+
+    <!-- Corps de la carte avec fond beige -->
+    <div class="card-body" style="background-color: #F5F5DC;">
+      <div class="row">
+        <!-- Informations de base dans un cadre bien organisé -->
+        <div class="col-md-6 mb-4">
+          <div class="info-card p-3">
+            <p class="card-text">
+              <i class="fas fa-map-marker-alt text-dark-brown"></i> <strong>Adresse:</strong> {{ prestataire.adresse }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-city text-dark-brown"></i> <strong>Ville:</strong> {{ prestataire.villeNom }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-envelope text-dark-brown"></i> <strong>Email:</strong> {{ prestataire.email }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-phone text-dark-brown"></i> <strong>Téléphone Fixe:</strong> {{ prestataire.fix }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-mobile-alt text-dark-brown"></i> <strong>Nom du Responsable:</strong> {{ prestataire.nomResponsable }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-mobile-alt text-dark-brown"></i> <strong>GSM Responsable:</strong> {{ prestataire.gsmResponsable }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-exclamation-circle text-dark-brown"></i> <strong>Priorité:</strong> {{ prestataire.priorite }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-user-tie text-dark-brown"></i> <strong>Fonction Responsable:</strong> {{ prestataire.fonctionResponsable }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-file-alt text-dark-brown"></i> <strong>Document:</strong> {{ prestataire.document }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-at text-dark-brown"></i> <strong>Mail Responsable:</strong> {{ prestataire.mailResponsable }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-ban text-dark-brown"></i> <strong>Blacklist:</strong> {{ prestataire.blacklist ? 'Oui' : 'Non' }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-comment-alt text-dark-brown"></i> <strong>Avis Consommateur:</strong> {{ prestataire.aviscons }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-globe text-dark-brown"></i> <strong>Info Net:</strong> {{ prestataire.infonet }}
+            </p>
+            <p class="card-text">
+              <i class="fas fa-percentage text-dark-brown"></i> <strong>Commission:</strong> {{ prestataire.commission }}%
+            </p>
+          </div>
+        </div>
+
+        <!-- Notes avec pagination dans un cadre bien organisé -->
+        <div class="col-md-6 mb-4">
+          <div class="info-card p-3">
+            <div *ngIf="prestataire.notes.length > 0">
+              <h6 class="card-subtitle mb-2 mt-3 text-muted">
+                <i class="fas fa-sticky-note text-dark-brown"></i> Notes:
+              </h6>
+              <ul class="list-group">
+                <li class="list-group-item" *ngFor="let note of pagedNotes">
+                  <div>
+                    <i class="fas fa-calendar-alt text-dark-brown"></i>
+                    <strong>Date:</strong> {{ note.dateNote | date: 'mediumDate' }}
+                  </div>
+                  <div>
+                    <i class="fas fa-comment-dots text-dark-brown"></i>
+                    <strong>Contexte:</strong> {{ note.context }}
+                  </div>
+                </li>
+              </ul>
+              <mat-paginator
+                [length]="prestataire.notes.length"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="[5, 10, 25, 100]"
+                (page)="pageChanged($event)"
+                class="mt-3"
+              ></mat-paginator>
+            </div>
+          </div>
+        </div>
+
+        <!-- Domaines d'activité dans un cadre bien organisé -->
+        <div class="col-md-6 mb-4">
+          <div class="info-card p-3">
+            <div *ngIf="prestataire.domainesActivite.length > 0">
+              <h6 class="card-subtitle mb-2 mt-3 text-muted">
+                <i class="fas fa-briefcase text-dark-brown"></i> Domaines d'activité:
+              </h6>
+              <ul class="list-group">
+                <li class="list-group-item" *ngFor="let domaine of prestataire.domainesActivite">
+                  <i class="fas fa-cogs text-dark-brown"></i> {{ domaine.nom }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags dans un cadre bien organisé -->
+        <div class="col-md-6 mb-4">
+          <div class="info-card p-3">
+            <div *ngIf="prestataire.tags.length > 0">
+              <h6 class="card-subtitle mb-2 mt-3 text-muted">
+                <i class="fas fa-tags text-dark-brown"></i> Tags:
+              </h6>
+              <ul class="list-group">
+                <li class="list-group-item" *ngFor="let tag of prestataire.tags">
+                  <i class="fas fa-tag text-dark-brown"></i> {{ tag.nom }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents dans un cadre bien organisé -->
+        <div class="col-md-6 mb-4">
+          <div class="info-card p-3">
+            <div *ngIf="prestataire.documents.length > 0">
+              <h6 class="card-subtitle mb-2 mt-3 text-muted">
+                <i class="fas fa-folder text-dark-brown"></i> Documents:
+              </h6>
+              <ul class="list-group">
+                <li class="list-group-item" *ngFor="let document of prestataire.documents">
+                  <div>
+                    <i class="fas fa-file-alt text-dark-brown"></i>
+                    <strong>Nom:</strong> {{ document.nom }}
+                  </div>
+                  <div>
+                    <i class="fas fa-file-download text-dark-brown"></i>
+                    <strong>Nom de fichier:</strong> {{ document.nomFichier }}
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Autres Prestations dans un cadre bien organisé -->
+        <div class="col-md-6 mb-4">
+          <div class="info-card p-3">
+            <div *ngIf="prestataire.autresPrest.length > 0">
+              <h6 class="card-subtitle mb-2 mt-3 text-muted">
+                <i class="fas fa-tools text-dark-brown"></i> Autres Informations:
+              </h6>
+              <ul class="list-group">
+                <li class="list-group-item" *ngFor="let autre of prestataire.autresPrest">
+                  <div>
+                    <i class="fas fa-key text-dark-brown"></i>
+                    <strong>Clé:</strong> {{ autre.cle }}
+                  </div>
+                  <div>
+                    <i class="fas fa-cogs text-dark-brown"></i>
+                    <strong>Valeur:</strong> {{ autre.valeur }}
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

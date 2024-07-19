@@ -36,4 +36,8 @@ export class AppNavItemComponent implements OnChanges {
       left: 0,
     });
   }
+
+  isAdmin(): boolean {
+    return this.navService.isAdmin();
+  }
 }

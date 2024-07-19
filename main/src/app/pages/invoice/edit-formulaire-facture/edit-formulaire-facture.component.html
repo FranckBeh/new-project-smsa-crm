@@ -1,7 +1,7 @@
 <!-- formulaire-facture.component.html -->
-<div class="container mt-3">
+<div class="container mt-3" style="border: 2px solid #dcc36b; padding: 20px; border-radius: 10px; background-color: #fdfdfd;">
   <!-- Flèche de retour -->
-  <a routerLink="/invoice" class="btn btn-outline-primary mb-3">
+  <a routerLink="/invoice" class="btn btn-outline-primary mb-3" style="color: #dcc36b; border-color: #dcc36b;">
     <i class="fa fa-arrow-left"></i> Retour
   </a>
 
@@ -10,7 +10,7 @@
     <div>
       <div class="mb-3">
         <label class="form-label">Facture: </label>
-        <input type="text" class="form-control" formControlName="nomEntreprise" readonly>
+        <input type="text" class="form-control" formControlName="nomEntreprise" readonly style="background-color: #181817; color: #dcc36b" formControlName="nomEntreprise">
       </div>
       <div class="mb-3" style="display: none;">
         <label class="form-label">ID de l'entreprise :</label>
@@ -22,7 +22,7 @@
       <div class="col-md-4">
         <div class="mb-3">
           <label for="invoiceState" class="form-label">Type :</label>
-          <select id="invoiceState" formControlName="invoiceState" class="form-select" required>
+          <select id="invoiceState" formControlName="invoiceState" class="form-select" required style="background-color: #FFF8E1; border-color: #8B4513;">
             <option value="" disabled selected>Sélectionnez un type</option>
             <option value="1">Facture</option>
             <option value="0">Devis</option>
@@ -30,19 +30,19 @@
             <option value="3">Avoir</option>
             <option value="4">Bon de commande</option>
           </select>
-          <div class="invalid-feedback"
-            *ngIf="editInvoiceForm.get('invoiceState')!.invalid && (editInvoiceForm.get('invoiceState')!.dirty || editInvoiceForm.get('invoiceState')!.touched)">
-            Veuillez choisir un état de facture.
-          </div>
+          <mat-error class="invalid-feedback"
+            *ngIf="editInvoiceForm.get('invoiceState')?.hasError('required')">
+            Veuillez choisir un type
+          </mat-error>
         </div>
 
         <!-- Afficher la liste déroulante supplémentaire pour le paiement -->
-        <div *ngIf="editInvoiceForm.get('invoiceState')!.value === 1 || editInvoiceForm.get('invoiceState')!.value === '1'">
+        <div *ngIf="editInvoiceForm.get('invoiceState')?.value == 1 || editInvoiceForm.get('invoiceState')?.value == '1'">
           <div class="mb-3">
             <label for="etatState" class="form-label">Type de paiement :</label>
-            <select id="etatState" formControlName="etatState"  class="form-select">
+            <select id="etatState" formControlName="etatState"  class="form-select" style="background-color: #FFF8E1; border-color: #8B4513;">
               <option value="" disabled selected>Sélectionnez un type facture</option>
-              <option value="1">Payer</option>
+              <option value="1">Payée</option>
               <option value="0">En créance</option>
             </select>
           </div>
@@ -62,7 +62,7 @@
         <!-- Référence -->
         <div class="mb-3">
           <label for="reference" class="form-label">Référence :</label>
-          <input type="text" id="reference" formControlName="reference" class="form-control" readonly>
+          <input type="text" id="reference" formControlName="reference" class="form-control" readonly style="background-color: #FFF8E1; border-color: #8B4513;">
           <div class="invalid-feedback"
             *ngIf="editInvoiceForm.get('reference')!.invalid && (editInvoiceForm.get('reference')!.dirty || editInvoiceForm.get('reference')!.touched)">
             La référence est requise.
@@ -74,7 +74,7 @@
       <div class="col-md-4">
         <div class="mb-3">
           <label for="creationDate" class="form-label">Date de création :</label>
-          <input type="date" id="creationDate" formControlName="creationDate" class="form-control" required>
+          <input type="date" id="creationDate" formControlName="creationDate" class="form-control" required style="background-color: #FFF8E1; border-color: #8B4513;">
           <div class="invalid-feedback"
             *ngIf="editInvoiceForm.get('creationDate')!.invalid && (editInvoiceForm.get('creationDate')!.dirty || editInvoiceForm.get('creationDate')!.touched)">
             La date de création est requise.
@@ -87,18 +87,18 @@
 
 
     <!-- Champs supplémentaires pour "Facture (Payé)" -->
-    <div class="row mb-3" *ngIf="editInvoiceForm.get('etatState')!.value ==='1' && editInvoiceForm.get('invoiceState')!.value ===1
-    || editInvoiceForm.get('etatState')!.value ==='1' && editInvoiceForm.get('invoiceState')!.value ==='1'">
+    <div class="row mb-3" *ngIf="editInvoiceForm.get('etatState')!.value =='1' && editInvoiceForm.get('invoiceState')!.value ==1
+    || editInvoiceForm.get('etatState')!.value =='1' && editInvoiceForm.get('invoiceState')!.value =='1'">
       <!-- Date de paiement -->
       <div class="col-md-4">
         <label for="paymentDate" class="form-label">Date de paiement :</label>
-        <input type="date" id="paymentDate" formControlName="paymentDate" class="form-control" required>
+        <input type="date" id="paymentDate" formControlName="paymentDate" class="form-control" required style="background-color: #FFF8E1; border-color: #8B4513;">
       </div>
 
       <!-- Moyen de paiement -->
       <div class="col-md-4">
         <label for="paymentMethod" class="form-label">Moyen de paiement :</label>
-        <select id="paymentMethod" formControlName="paymentMethod" class="form-select" required>
+        <select id="paymentMethod" formControlName="paymentMethod" class="form-select" required style="background-color: #FFF8E1; border-color: #8B4513;">
           <option value="" disabled selected>Sélectionnez un Moyen de paiement</option>
           <option value="0">Cash</option>
           <option value="1">Chèque</option>
@@ -111,11 +111,11 @@
       <!-- Commentaire -->
       <div class="col-md-4">
         <label for="comment" class="form-label">Commentaire :</label>
-        <textarea id="comment" formControlName="comment" class="form-control"></textarea>
+        <textarea id="comment" formControlName="comment" class="form-control" style="background-color: #FFF8E1; border-color: #8B4513;"></textarea>
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-12">
         <!-- Société -->
         <div class="mb-3">
           <mat-form-field class="example-full-width">
@@ -156,10 +156,10 @@
       <div class="col-md-6">
         <!-- Adresse de l'entreprise -->
         <div class="mb-3">
-          <label for="adresseEntreprise" class="form-label">Adresse de l'entreprise :</label>
-          <input type="text" id="adresseEntreprise" formControlName="adresseEntreprise" class="form-control" required>
+          <label for="adresseEntreprise" class="form-label">ICE :</label>
+          <input type="text" id="adresseEntreprise" formControlName="adresseEntreprise" class="form-control">
           <div class="invalid-feedback error-message" *ngIf="editInvoiceForm.get('adresseEntreprise')!.invalid && (editInvoiceForm.get('adresseEntreprise')!.dirty || editInvoiceForm.get('adresseEntreprise')!.touched)">
-            L'adresse de l'entreprise est requise.
+            L'ICE de l'entreprise est requise.
           </div>
         </div>
       </div>
@@ -169,7 +169,7 @@
 
 
     <!-- Liste des articles -->
-    <div formArrayName="articles" class="mb-3">
+    <div formArrayName="articles" class="mb-3" style=" border: 2px solid #dcc36b; border-radius: 10px; background-color: #fdfdfd; border-color: #8B4513;">
       <div *ngFor="let article of articles.controls; let i = index" [formGroupName]="i"
         class="d-flex border rounded position-relative pe-0 mb-4">
         <div class="row w-100 m-0 p-3">
@@ -227,13 +227,9 @@
         <div class="card mb-2 flex-grow-1 me-2">
           <div class="card-body">
             <h5 class="card-title">TVA</h5>
-            <label for="tva" class="form-label">Taux de TVA:</label>
-            <select id="tva" formControlName="tvaRate" class="form-select" (change)="calculateTotalTTC()">
-              <option value="0.0">0%</option>
-              <option value="0.18">18%</option>
-              <option value="0.20">20%</option>
-              <!-- Ajoutez d'autres options de taux de TVA si nécessaire -->
-            </select>
+            <label for="tva" class="form-label">Montant de la TVA:</label>
+            <input id="tva" type="number" formControlName="tvaRate" class="form-control" placeholder="Entrez le montant de la tva">
+
 
           </div>
         </div>
@@ -278,6 +274,9 @@
     <!-- Bouton de soumission -->
     <div class="mb-3">
       <button type="submit" class="btn btn-success" *ngIf="authService.isAdmin()" (click)="onSubmit()">Enregistrer la facture</button>
+      <button routerLink="/invoice" class="btn btn-outline-danger m-3">
+        <i class="fas fa-times"></i> annuler
+      </button>
     </div>
   </form>
 </div>

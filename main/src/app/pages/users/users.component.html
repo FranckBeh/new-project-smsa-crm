@@ -1,0 +1,125 @@
+<div class="user-crud-container" >
+  <h2>Gestion des Utilisateurs</h2>
+
+  <button class="btn btn-primary" *ngIf="authService.isAdmin()"  (click)="showUserForm()">Ajouter un utilisateur</button>
+
+  <div *ngIf="showForm" class="user-form-container">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
+      <input formControlName="IdUser" type="hidden">
+
+      <div class="form-group">
+        <label for="login">Login:</label>
+        <input id="login" formControlName="login" type="text" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input id="password" formControlName="password" type="password" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input id="email" formControlName="email" type="email" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="tel">Tel:</label>
+        <input id="tel" formControlName="tel" type="text" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="prenom">Prenom:</label>
+        <input id="prenom" formControlName="prenom" type="text" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="nom">Nom:</label>
+        <input id="nom" formControlName="nom" type="text" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role:</label>
+        <select id="role" formControlName="role" class="form-control">
+          <option value="Concierge">Concierge</option>
+          <option value="Administrateur">Administrateur</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="online">Online:</label>
+        <label class="switch">
+          <input id="online" formControlName="online" type="checkbox">
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="active">Active:</label>
+        <label class="switch">
+          <input id="active" formControlName="active" type="checkbox">
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ editingUser ? 'Update' : 'Create' }}</button>
+        <button type="button" class="btn btn-secondary" (click)="showForm = false; userForm.reset(); editingUser = null;">Clear</button>
+      </div>
+    </form>
+  </div>
+<div *ngIf="authService.isAdmin()" >
+  <h3>Liste des Utilisateurs</h3>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead >
+      <tr>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>login</th>
+        <th>Email</th>
+        <th *ngIf="authService.isAdmin()" >Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.nom }}</td>
+        <td>{{ user.prenom }}</td>
+        <td>{{ user.login }}</td>
+        <td>{{ user.email }}</td>
+
+        <td>
+          <button class="btn btn-primary btn-sm" *ngIf="authService.isAdmin()" (click)="editUser(user)">Modifier</button>
+          <button class="btn btn-danger btn-sm" *ngIf="authService.isAdmin()"  (click)="deleteUser(user.IdUser)">Supprimer</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Contrôles de pagination -->
+<!-- Contrôles de pagination -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <a class="page-link" href="javascript:void(0)" (click)="onPageChange(currentPage - 1)" aria-label="Précédent">
+        <span aria-hidden="true">«</span>
+        <span class="sr-only">Précédent</span>
+      </a>
+    </li>
+    <li class="page-item" *ngFor="let page of pages" [class.active]="currentPage === page">
+      <a class="page-link" href="javascript:void(0)" (click)="onPageChange(page)">{{ page }}</a>
+    </li>
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <a class="page-link" href="javascript:void(0)" (click)="onPageChange(currentPage + 1)" aria-label="Suivant">
+        <span aria-hidden="true">»</span>
+        <span class="sr-only">Suivant</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+</div>
+
+<!-- users.component.html -->
+</div>
+
+

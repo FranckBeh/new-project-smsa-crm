@@ -245,6 +245,28 @@ class ClientController {
     }
   }
 
+  async getAllClient(req, res) {
+    try {
+      const clients = await Client.findAll({
+        where: {
+          expiration: {
+            [Op.gt]: new Date()
+          }
+        },
+        include: [
+          { model: TypeClient, as: 'typeclient', attributes: ['NomType'] },
+          { model: Societe, as: 'societe', attributes: ['nom'] }
+        ],
+      });
+  
+      res.json(clients);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des clients :", error);
+      res.status(500).json({ message: "Erreur interne du serveur", details: error.message });
+    }
+  }
+  
+
   async searchClients(req, res) {
     try {
         const page = parseInt(req.query.page) || 0;

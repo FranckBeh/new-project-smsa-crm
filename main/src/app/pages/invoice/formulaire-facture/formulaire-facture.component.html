@@ -1,28 +1,26 @@
 <!-- formulaire-facture.component.html -->
-<div class="container mt-3" *ngIf="entreprise">
+<div class="container mt-3" *ngIf="entreprise" style="border: 2px solid #dcc36b; padding: 20px; border-radius: 10px; background-color: #fdfdfd;">
   <!-- Flèche de retour -->
-  <a routerLink="/invoice" class="btn btn-outline-primary mb-3">
+  <a routerLink="/invoice" class="btn btn-outline-primary mb-3" style="color: #dcc36b; border-color: #dcc36b;">
     <i class="fa fa-arrow-left"></i> Retour
   </a>
 
   <form [formGroup]="invoiceForm" class="needs-validation" novalidate>
     <!-- État de la facture -->
-    <div *ngIf="entreprise">
-      <div class="mb-3">
-        <label class="form-label">Facture: </label>
-        <input type="text" class="form-control" formControlName="nomEntreprise" readonly>
-      </div>
-      <div class="mb-3" style="display: none;">
-        <label class="form-label">ID de l'entreprise :</label>
-        <input type="text" class="form-control" formControlName="idEntreprise" readonly>
-      </div>
-      <!-- Ajoutez d'autres détails de l'entreprise ici -->
+    <div *ngIf="entreprise" class="mb-3">
+      <label class="form-label">Facture: </label>
+      <input type="text" class="form-control"  style="background-color: #181817; color: #dcc36b" formControlName="nomEntreprise" readonly>
     </div>
-    <div class="row gy-2 gx-3 align-items-center">
+    <div class="mb-3 d-none">
+      <label class="form-label">ID de l'entreprise :</label>
+      <input type="text" class="form-control" style="background-color: #FFF8E1; border-color: #8B4513;" formControlName="idEntreprise" readonly>
+    </div>
+
+    <div class="row gy-3">
       <div class="col-md-4">
         <div class="mb-3">
           <label for="invoiceState" class="form-label">Type :</label>
-          <select id="invoiceState" formControlName="invoiceState" class="form-select" required>
+          <select id="invoiceState" formControlName="invoiceState" class="form-select" style="background-color: #FFF8E1; border-color: #8B4513;">
             <option value="" disabled selected>Sélectionnez un type</option>
             <option value="1">Facture</option>
             <option value="0">Devis</option>
@@ -30,71 +28,58 @@
             <option value="3">Avoir</option>
             <option value="4">Bon de commande</option>
           </select>
-          <div class="invalid-feedback"
-            *ngIf="invoiceForm.get('invoiceState')!.invalid && (invoiceForm.get('invoiceState')!.dirty || invoiceForm.get('invoiceState')!.touched)">
-            Veuillez choisir un état de facture.
+          <div class="invalid-feedback" *ngIf="invoiceForm.get('invoiceState')?.hasError('required')">
+            Veuillez choisir un type
           </div>
         </div>
 
         <!-- Afficher la liste déroulante supplémentaire pour le paiement -->
         <div *ngIf="invoiceForm.get('invoiceState')!.value === '1'">
           <div class="mb-3">
-            <label for="etatState" class="form-label">Type de paiement :</label>
-            <select id="etatState" formControlName="etatState"  class="form-select">
+            <label for="etatState" class="form-label">Etat de la facture :</label>
+            <select id="etatState" formControlName="etatState" class="form-select" style="background-color: #FFF8E1; border-color: #8B4513;">
               <option value="" disabled selected>Sélectionnez un type facture</option>
-              <option value="1">Payer</option>
+              <option value="1">Payée</option>
               <option value="0">En créance</option>
             </select>
           </div>
         </div>
 
         <!-- Proforma -->
-        <div class="col-auto">
-          <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="isProForma" formControlName="isProForma">
-            <label class="form-check-label" for="isProForma">Facture Proforma</label>
-          </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="isProForma" formControlName="isProForma">
+          <label class="form-check-label" for="isProForma">Facture Proforma</label>
         </div>
       </div>
 
-
       <div class="col-md-4">
-        <!-- Référence -->
         <div class="mb-3">
           <label for="reference" class="form-label">Référence :</label>
-          <input type="text" id="reference" formControlName="reference" class="form-control" readonly>
-          <div class="invalid-feedback"
-            *ngIf="invoiceForm.get('reference')!.invalid && (invoiceForm.get('reference')!.dirty || invoiceForm.get('reference')!.touched)">
+          <input type="text" id="reference" formControlName="reference" class="form-control" readonly style="background-color: #FFF8E1; border-color: #8B4513;">
+          <div class="invalid-feedback" *ngIf="invoiceForm.get('reference')?.invalid">
             La référence est requise.
           </div>
         </div>
       </div>
 
-      <!-- Date de création -->
       <div class="col-md-4">
         <div class="mb-3">
           <label for="creationDate" class="form-label">Date de création :</label>
-          <input type="date" id="creationDate" formControlName="creationDate" class="form-control" required>
-          <div class="invalid-feedback"
-            *ngIf="invoiceForm.get('creationDate')!.invalid && (invoiceForm.get('creationDate')!.dirty || invoiceForm.get('creationDate')!.touched)">
+          <input type="date" id="creationDate" formControlName="creationDate" class="form-control" required style="background-color: #FFF8E1; border-color: #8B4513;">
+          <div class="invalid-feedback" *ngIf="invoiceForm.get('creationDate')?.hasError('required') && (invoiceForm.get('creationDate')!.dirty || invoiceForm.get('creationDate')!.touched)">
             La date de création est requise.
           </div>
         </div>
       </div>
-
-
     </div>
 
-
     <!-- Champs supplémentaires pour "Facture (Payé)" -->
-    <div class="row mb-3" *ngIf="invoiceForm.get('etatState')!.value === '1' && invoiceForm.get('invoiceState')!.value === '1'">
-      <!-- Date de paiement -->
+    <div class="row gy-3" *ngIf="invoiceForm.get('etatState')!.value === '1' && invoiceForm.get('invoiceState')!.value === '1'">
       <div class="col-md-4">
         <label for="paymentDate" class="form-label">Date de paiement :</label>
-        <input type="date" id="paymentDate" formControlName="paymentDate" class="form-control" required>
+        <input type="date" id="paymentDate" formControlName="paymentDate" class="form-control" required style="background-color: #FFF8E1; border-color: #8B4513;">
       </div>
 
-      <!-- Moyen de paiement -->
       <div class="col-md-4">
         <label for="paymentMethod" class="form-label">Moyen de paiement :</label>
         <select id="paymentMethod" formControlName="paymentMethod" class="form-select" required>
@@ -107,183 +92,139 @@
         </select>
       </div>
 
-      <!-- Commentaire -->
       <div class="col-md-4">
         <label for="comment" class="form-label">Commentaire :</label>
         <textarea id="comment" formControlName="comment" class="form-control"></textarea>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-6">
-        <!-- Société -->
+
+    <div class="row gy-3">
+      <div class="col-md-12">
         <div class="mb-3">
           <mat-form-field class="example-full-width">
             <mat-label>Société</mat-label>
-            <input type="text"
-                   placeholder="Choisissez une société"
-                   aria-label="Société"
-                   matInput
-                   [formControl]="societeControl"
-                   [matAutocomplete]="auto" id="societe">
-                   <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onSocieteSelected($event)">
-
-                    <mat-option *ngFor="let societe of filteredSocietes | async" [value]="societe">
-                      {{ societe.nom }}
-                    </mat-option>
-                  </mat-autocomplete>
-
+            <input type="text" placeholder="Choisissez une société" aria-label="Société" matInput [formControl]="societeControl" [matAutocomplete]="auto" id="societe">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onSocieteSelected($event)" required>
+              <mat-option *ngFor="let societe of filteredSocietes | async" [value]="societe">
+                {{ societe.nom }}
+              </mat-option>
+            </mat-autocomplete>
           </mat-form-field>
-
-
-
-
         </div>
       </div>
     </div>
-    <!-- Ajouter les champs pour préciser le nom de l'entreprise et l'adresse -->
-    <div class="row" *ngIf="invoiceForm.get('societe')!.value === 0">
+
+    <div class="row gy-3" *ngIf="invoiceForm.get('societe')!.value === 0">
       <div class="col-md-6">
-        <!-- Nom de l'entreprise -->
         <div class="mb-3">
           <label for="nomSociete" class="form-label">Nom de l'entreprise :</label>
           <input type="text" formControlName="nomSociete" (blur)="validateField('nomSociete')" class="form-control">
-          <div class="invalid-feedback" *ngIf="invoiceForm.get('nomSociete')!.invalid && (invoiceForm.get('nomSociete')!.dirty || invoiceForm.get('nomSociete')!.touched)">
+          <div class="invalid-feedback" *ngIf="invoiceForm.get('societe')!.value === 0 && invoiceForm.get('nomSociete')!.invalid || (invoiceForm.get('nomSociete')!.dirty || invoiceForm.get('nomSociete')!.touched)">
             Le nom de l'entreprise est requis.
           </div>
         </div>
       </div>
       <div class="col-md-6">
-        <!-- Adresse de l'entreprise -->
         <div class="mb-3">
-          <label for="adresseEntreprise" class="form-label">Adresse de l'entreprise :</label>
+          <label for="adresseEntreprise" class="form-label">ICE :</label>
           <input type="text" id="adresseEntreprise" formControlName="adresseEntreprise" class="form-control" required>
-          <div class="invalid-feedback error-message" *ngIf="invoiceForm.get('adresseEntreprise')!.invalid && (invoiceForm.get('adresseEntreprise')!.dirty || invoiceForm.get('adresseEntreprise')!.touched)">
+          <div class="invalid-feedback" *ngIf="invoiceForm.get('societe')!.value === 0 && invoiceForm.get('adresseEntreprise')!.invalid || (invoiceForm.get('adresseEntreprise')!.dirty || invoiceForm.get('adresseEntreprise')!.touched)">
             L'adresse de l'entreprise est requise.
           </div>
         </div>
       </div>
     </div>
 
-
-
-
-    <!-- Liste des articles -->
-    <div formArrayName="articles" class="mb-3">
-      <div *ngFor="let article of articles.controls; let i = index" [formGroupName]="i"
-        class="d-flex border rounded position-relative pe-0 mb-4">
+    <div formArrayName="articles" class="mb-3" style=" border: 2px solid #dcc36b; border-radius: 10px; background-color: #fdfdfd; border-color: #8B4513;">
+      <div *ngFor="let article of articles.controls; let i = index" [formGroupName]="i" class="d-flex border rounded position-relative pe-0 mb-4">
         <div class="row w-100 m-0 p-3">
-          <!-- Désignation -->
           <div class="col-md-6 col-12 mb-md-0 mb-3 ps-md-0">
-            <p class="mb-2 repeater-title">Désignation :</p>
-            <input type="text" id="designation{{i}}" formControlName="designation"
-              class="form-control item-details mb-2" required>
-            <div class="invalid-feedback"
-              *ngIf="getArticleControl(i, 'designation').invalid && (getArticleControl(i, 'designation').dirty || getArticleControl(i, 'designation').touched)">
+            <label class="form-label">Désignation :</label>
+            <input type="text" id="designation{{i}}" formControlName="designation" class="form-control" required >
+            <div class="invalid-feedback" *ngIf="getArticleControl(i, 'designation')?.invalid || (getArticleControl(i, 'designation').dirty || getArticleControl(i, 'designation').touched)">
               La désignation est requise.
             </div>
           </div>
 
-          <!-- Prix unitaire TTC de vente -->
           <div class="col-md-3 col-12 mb-md-0 mb-3">
-            <p class="mb-2 repeater-title">PU de vente :</p>
-            <input type="number" aria-valuemin="1" id="priceSale{{i}}" formControlName="priceSale"
-              class="form-control invoice-item-price mb-2" required (input)="calculateTotalTTC()" >
-            <div class="invalid-feedback"
-              *ngIf="getArticleControl(i, 'priceSale').invalid && (getArticleControl(i, 'priceSale').dirty || getArticleControl(i, 'priceSale').touched)">
+            <label class="form-label">PU de vente :</label>
+            <input type="number" aria-valuemin="1" id="priceSale{{i}}" formControlName="priceSale" class="form-control" required (input)="calculateTotalTTC()" >
+            <div class="invalid-feedback" *ngIf="getArticleControl(i, 'priceSale')?.invalid || (getArticleControl(i, 'priceSale').dirty || getArticleControl(i, 'priceSale').touched)">
               Le prix unitaire TTC de vente est requis.
             </div>
           </div>
 
-          <!-- Quantité -->
           <div class="col-md-2 col-12 mb-md-0 mb-3">
-            <p class="mb-2 repeater-title">Quantité :</p>
-            <input type="number" aria-valuemin="1" id="quantity{{i}}" formControlName="quantity" class="form-control invoice-item-qty"
-              required (input)="calculateTotalTTC()">
-            <div class="invalid-feedback"
-              *ngIf="getArticleControl(i, 'quantity').invalid && (getArticleControl(i, 'quantity').dirty || getArticleControl(i, 'quantity').touched)">
+            <label class="form-label">Quantité :</label>
+            <input type="number" aria-valuemin="1" id="quantity{{i}}" formControlName="quantity" class="form-control" required (input)="calculateTotalTTC()">
+            <div class="invalid-feedback" *ngIf="getArticleControl(i, 'quantity')?.invalid || (getArticleControl(i, 'quantity').dirty || getArticleControl(i, 'quantity').touched)">
               La quantité est requise.
             </div>
           </div>
 
-          <!-- Total TTC -->
-          <div class="col-md-1 col-12 pe-0">
-            <p class="mb-2 repeater-title">Total :</p>
+          <div class="col-md-1 col-12 pe-0" >
+            <label class="form-label">Total :</label>
             <p class="mb-0">{{ getTotalTTC(i) }}</p>
           </div>
         </div>
 
-        <!-- TVA -->
-
-        <!-- Bouton de suppression d'article -->
         <div class="d-flex flex-column align-items-center justify-content-between border-start p-2">
-          <i class="bx bx-x fs-4 text-muted cursor-pointer" (click)="removeArticle(i)"></i>
+          <i class="fas fa-times fs-4 text-muted cursor-pointer" (click)="removeArticle(i)"></i>
         </div>
       </div>
     </div>
-    <!-- Total général pour tous les articles -->
-    <div class="row">
-      <div class="col-12 d-flex justify-content-between">
-        <div class="card mb-2 flex-grow-1 me-2">
-          <div class="card-body">
-            <h5 class="card-title">TVA</h5>
-            <label for="tva" class="form-label">Taux de TVA:</label>
-            <select id="tva" formControlName="tvaRate" class="form-select" (change)="calculateTotalTTC()">
-              <option value="0.0">0%</option>
-              <option value="0.18">18%</option>
-              <option value="0.20">20%</option>
-              <!-- Ajoutez d'autres options de taux de TVA si nécessaire -->
-            </select>
 
+    <div class="row gy-3">
+      <div class="col-md-4">
+        <div class="card mb-2">
+          <div class="card-body">
+            <h5 class="card-title">Montant de la TVA:</h5>
+            <input id="tvarate" formControlName="tvaRate" type="number" class="form-control" >
           </div>
         </div>
+      </div>
 
-        <!-- Montant total TTC -->
-        <div class="card mb-2 flex-grow-1 me-2">
+      <div class="col-md-4">
+        <div class="card mb-2">
           <div class="card-body">
             <h5 class="card-title">Total Général TTC</h5>
-            <p class="card-text">{{ totalTTC | currency:' MAD' }}</p>
+            <p class="card-text">{{ totalTTC | currency:'MAD' }}</p>
           </div>
         </div>
-
+        </div>
+        <div class="col-md-4">
         <!-- Montant de la TVA -->
         <div class="card mb-2 flex-grow-1">
           <div class="card-body">
             <h5 class="card-title">Montant de la TVA</h5>
-            <p class="card-text" >{{ getTotalTVA() | currency:' MAD' }}</p>
+            <p class="card-text" >{{ getTotalTVA() | currency:' MAD ' }}</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Bouton d'ajout d'article -->
-    <div class="row">
+    <div class="row gy-3">
       <div class="col-12">
         <button type="button" class="btn btn-primary" (click)="addArticle()">Ajouter un article</button>
       </div>
     </div>
 
-
-
-    <!-- Note -->
     <div class="mb-3">
       <label for="note" class="form-label">Note :</label>
       <textarea id="note" formControlName="note" class="form-control"></textarea>
-      <div class="invalid-feedback"
-        *ngIf="invoiceForm.get('note')!.invalid && (invoiceForm.get('note')!.dirty || invoiceForm.get('note')!.touched)">
-        La note est requise.
-      </div>
     </div>
 
-    <!-- Bouton de soumission -->
     <div class="mb-3">
-      <button type="submit" class="btn btn-success"  (click)="onSubmit()">Enregistrer la facture</button>
+      <button type="submit" class="btn btn-success" (click)="onSubmit()">Enregistrer la facture</button>
+      <button routerLink="/invoice" class="btn btn-outline-danger m-3">
+        <i class="fas fa-times"></i> Annuler
+      </button>
     </div>
   </form>
 </div>
 
 <div class="container mt-3" *ngIf="!entreprise" style="text-align: center; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
   <p style="font-size: 20px; color: #333;">Aucune entreprise n'est sélectionnée.</p>
-
   <a routerLink="/invoice" class="btn btn-outline-primary mb-3" style="font-size: 18px; padding: 10px 20px;">
     <i class="fa fa-arrow-left"></i> Retour
   </a>

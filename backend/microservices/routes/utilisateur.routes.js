@@ -5,6 +5,7 @@ const UtilisateurController = require('./../controllers/UtilisateurController');
 // Obtenir tous les utilisateurs
 router.get('/', UtilisateurController.getAll);
 router.get('/liste', UtilisateurController.getAll);
+router.get('/allUser', UtilisateurController.getAllUser);
 // Obtenir un utilisateur par ID
 router.get('/:id', UtilisateurController.getById);
 

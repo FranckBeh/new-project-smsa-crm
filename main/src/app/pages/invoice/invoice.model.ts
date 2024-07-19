@@ -7,7 +7,7 @@ export interface Invoice {
   listinvart: Listinvart[];
   nc: number;
   totalTTC: number;
-  type: string;
+  type: number;
   id: number;
   customerName: string;
   customerAddress: string;

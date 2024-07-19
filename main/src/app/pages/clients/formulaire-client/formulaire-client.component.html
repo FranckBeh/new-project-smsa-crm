@@ -2,45 +2,91 @@
   <div class="card mb-4">
     <h5 class="card-header">Formulaire Client - Étape {{ currentStep }}</h5>
     <form class="card-body" [formGroup]="clientForm" (ngSubmit)="onSubmit()">
-      <div *ngIf="currentStep == 1">
+      <div *ngIf="currentStep == 1" formGroupName="clientData">
         <h6>1. Account Details</h6>
         <div class="row g-3">
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Civilité</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <mat-label>Civilité</mat-label>
+              <mat-select formControlName="civilite" required>
+                <mat-option value="Monsieur">Monsieur</mat-option>
+                <mat-option value="Madame">Madame</mat-option>
+                <mat-option value="Mademoiselle">Mademoiselle</mat-option>
+                </mat-select>
+              <mat-error *ngIf="!clientForm.get('clientData.civilite')">Civilité est requise</mat-error>
+            </mat-form-field>
+          </div>
+
           <div class="col-md-6">
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Nom</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
               <input matInput formControlName="nom" />
+              <mat-error *ngIf="clientForm.get('clientData.nom')?.hasError('required') || (clientForm.get('clientData.nom')?.dirty || clientForm.get('clientData.nom')?.touched)">
+                Nom est requis
+              </mat-error>
             </mat-form-field>
           </div>
           <div class="col-md-6">
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Prénom</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
               <input matInput formControlName="prenom" />
+              <mat-error *ngIf="clientForm.get('clientData.prenom')?.hasError('required')">
+                Prénom est requis
+              </mat-error>
             </mat-form-field>
           </div>
           <div class="col-md-6">
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Type</mat-label>
-            <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput formControlName="type" type="number" />
-            </mat-form-field>
+            <!-- Champ de recherche pour le type -->
+<mat-form-field appearance="outline" class="w-100" color="primary">
+  <mat-label>Type de client (recherche)</mat-label>
+  <input matInput [formControl]="searchControl" [matAutocomplete]="autoTypes" [value]="displayType(clientForm.get('clientData.type')?.value)">
+  <mat-autocomplete #autoTypes="matAutocomplete" [displayWith]="displayType" (optionSelected)="onTypeSelected($event)">
+    <mat-option *ngFor="let type of filteredTypes | async" [value]="type">
+      {{ type.NomType }}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
           </div>
           <div class="col-md-6">
             <div class="form-password-toggle">
               <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Login</mat-label>
               <mat-form-field appearance="outline" class="w-100" color="primary">
-                <input matInput formControlName="login" />
+                <input matInput formControlName="login" (input)="checkLoginAvailability()" />
+                <mat-error *ngIf="clientForm.get('clientData.login')?.hasError('required')">
+                  Login est requis
+                </mat-error>
               </mat-form-field>
+              <p *ngIf="loginChecked">
+                {{ isLoginAvailable ? 'Le login est disponible.' : 'Le login est déjà pris.' }}
+              </p>
             </div>
           </div>
           <div class="col-md-6">
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Société</mat-label>
+            <!-- Champ de recherche pour la société -->
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput formControlName="societe" />
+              <mat-label>Société (recherche)</mat-label>
+              <input matInput [formControl]="searchSocieteControl" [matAutocomplete]="autoSocietes" [value]="displaySociete(clientForm.get('clientData.societe')?.value)">
+              <mat-autocomplete #autoSocietes="matAutocomplete" [displayWith]="displaySociete"  (optionSelected)="onSocieteSelected($event)">
+                <mat-option *ngFor="let societe of filteredSocietes | async" [value]="societe">
+                  {{ societe.nom }}
+                </mat-option>
+              </mat-autocomplete>
+              <!-- Indicateur de chargement -->
+              <mat-spinner *ngIf="isLoadingSocietes" diameter="20"></mat-spinner>
             </mat-form-field>
+
+
           </div>
           <div class="col-md-6">
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Fonction</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
               <input matInput formControlName="fonction" />
+              <mat-error *ngIf="clientForm.get('clientData.fonction')?.hasError('required')">
+                Fonction est requis
+              </mat-error>
             </mat-form-field>
           </div>
           <div class="col-md-6">
@@ -49,24 +95,52 @@
               <input matInput formControlName="expiration" [matDatepicker]="picker" />
               <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
+              <mat-error *ngIf="clientForm.get('clientData.expiration')?.hasError('required')">
+                Date d'expiration est requis
+              </mat-error>
             </mat-form-field>
           </div>
         </div>
       </div>
-      <div *ngIf="currentStep == 2">
+      <div *ngIf="currentStep == 2" formGroupName="clientData">
         <hr class="my-4 mx-n4">
         <h6>2. Personal Info</h6>
         <div class="row g-3">
           <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">GSM Personnel</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input type="tel" matInput formControlName="gsmPerso" />
+              <mat-error *ngIf="clientForm.get('clientData.gsmPerso')?.hasError('tel')">
+                format Inconnu
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">GSM Professionnel</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input type="tel" matInput formControlName="gsmPro" />
+              <mat-error *ngIf="clientForm.get('clientData.gsmPro')?.hasError('tel')">
+               Format incorrect
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-6">
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Fixe Personnel</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput formControlName="fixePerso" />
+              <input matInput formControlName="fixePerso" type="tel" />
+              <mat-error *ngIf="clientForm.get('clientData.fixePerso')?.hasError('tel')">
+                Fixe Personnel est requis
+              </mat-error>
             </mat-form-field>
           </div>
           <div class="col-md-6">
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Fixe Professionnel</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput formControlName="fixePro" />
+              <input matInput formControlName="fixePro" type="tel" />
+              <mat-error *ngIf="clientForm.get('clientData.fixePro')?.hasError('tel')">
+                Fixe Professionnel est requis
+              </mat-error>
             </mat-form-field>
           </div>
           <div class="col-md-6">
@@ -79,87 +153,114 @@
             <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Email Professionnel</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
               <input matInput formControlName="mailPro" type="email" />
+
             </mat-form-field>
           </div>
-          <!-- Ajoutez ici d'autres champs pour l'étape 2 -->
         </div>
       </div>
       <div *ngIf="currentStep == 3">
         <hr class="my-4 mx-n4">
         <h6>3. Conjoints Info</h6>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Nom du conjoint</mat-label>
-            <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput />
-            </mat-form-field>
-          </div>
-          <div class="col-md-6">
-            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">GSM Professionnel du conjoint</mat-label>
-            <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput />
-            </mat-form-field>
-          </div>
+        <div class="col-md-6 w-100 m-0 p-3" formGroupName="clientData">
+          <mat-form-field appearance="outline" class="w-100" color="primary">
+            <mat-label>Situation matrimoniale</mat-label>
+            <mat-select formControlName="situation" required>
+              <mat-option value="Celibataire">Célibataire</mat-option>
+              <mat-option value="Marie">Marié(e)</mat-option>
+              <mat-option value="Divorce">Divorcé(e)</mat-option>
+              <mat-option value="Veuf">Veuf</mat-option>
+              <mat-option value="Veuve">Veuve</mat-option>
+              <mat-option value="Concubinage">Concubinage</mat-option>
+              <mat-option value="Inconnu">Inconnu</mat-option>
+            </mat-select>
+            <mat-error *ngIf="clientForm.get('clientData.situation')?.hasError('required')">Situation matrimoniale est requise</mat-error>
+          </mat-form-field>
 
+        </div>
+        <div div *ngIf="currentStep == 3">
+<div class="row g-3" formGroupName="conjointData" *ngIf="clientForm.get('clientData.situation')?.value === 'Marie' ||clientForm.get('clientData.situation')?.value ==='Concubinage'">
           <div class="col-md-6">
-            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Email du conjoint</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput type="email" />
+              <mat-label>Nom du Conjoint</mat-label>
+              <input matInput formControlName="nom">
+            </mat-form-field>
+            <mat-error *ngIf="(clientForm.get('clientData.situation')?.value === 'Marie' ||clientForm.get('clientData.situation')?.value==='Concubinage') && clientForm.get('conjointData.nom')?.hasError('required')">champs requis</mat-error>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <mat-label>GSM Pro</mat-label>
+              <input matInput formControlName="gsmPro">
             </mat-form-field>
           </div>
           <div class="col-md-6">
-            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">GSM Personnel du conjoint</mat-label>
             <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput />
-            </mat-form-field>
-          </div>
-          <div class="col-md-6">
-            <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-12 d-block">Date d'anniversaire du conjoint</mat-label>
-            <mat-form-field appearance="outline" class="w-100" color="primary">
-              <input matInput [matDatepicker]="picker" />
-              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-          </div>
+              <mat-label>Anniversaire</mat-label>
+              <input matInput formControlName="anniversaire" [matDatepicker]="pickerAnniversaire">
+              <mat-datepicker-toggle matSuffix [for]="pickerAnniversaire"></mat-datepicker-toggle>
+              <mat-datepicker #pickerAnniversaire></mat-datepicker>
 
-
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="mail">
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <mat-label>GSM Personnel</mat-label>
+              <input matInput formControlName="gsmPerso">
+            </mat-form-field>
+          </div>
+        </div>
         </div>
 
       </div>
-      <div *ngIf="currentStep === 4">
-        <!-- Étape 4 : Informations sur les enfants -->
-        <h6>4. Enfants Info</h6>
-        <!-- Informations sur les enfants -->
-        <div *ngFor="let enfant of enfants.controls; let i=index" class="child-info d-flex border rounded position-relative pe-0 mb-2">
-          <div class="row w-100 m-0 p-3">
-            <div class="col-md-6">
-              <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-2 d-block text-center text-md-start">Nom de l'enfant</mat-label>
-              <mat-form-field appearance="outline" class="w-100" color="primary">
-                <input matInput formControlName="nom" />
-              </mat-form-field>
-            </div>
-            <div class="col-md-5">
-              <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-2 d-block text-center text-md-start">Date de naissance de l'enfant</mat-label>
-              <mat-form-field appearance="outline" class="w-100" color="primary">
-                <input matInput [matDatepicker]="picker" formControlName="dateNaissance" />
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field>
-            </div>
-            <div class="col-md-1 d-flex align-items-center justify-content-center justify-content-md-start">
-              <i class="bx bx-x fs-4 text-muted cursor-pointer" (click)="removeChild(i)"></i>
-            </div>
-          </div>
+<div *ngIf="currentStep === 4 "  >
+  <div class="col-md-6 w-100 m-0 p-3" formGroupName="clientData">
+    <mat-form-field appearance="outline" class="w-100" color="primary">
+      <mat-label>Avez-vous des enfant</mat-label>
+      <mat-select formControlName="nbrEnfant" >
+        <mat-option value="oui">Oui</mat-option>
+        <mat-option value="non">Non</mat-option>
 
-          <!-- Bouton pour supprimer cet enfant -->
-        </div>
+      </mat-select>
 
-        <!-- Bouton pour ajouter un nouvel enfant -->
-        <button type="button" class="btn btn-success mt-3" (click)="addChild()">Ajouter un enfant</button>
+    </mat-form-field>
+
+  </div>
+  <div formArrayName="enfantsData" *ngIf="clientForm.get('clientData.nbrEnfant')?.value ==='oui' ">
+    <h6>4. Enfants Info</h6>
+    <div *ngFor="let enfant of enfants.controls; let i = index" [formGroupName]="i" class="child-info d-flex border rounded position-relative pe-0 mb-2">
+      <div class="row w-100 m-0 p-3">
+        <div class="col-md-6">
+          <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-2 d-block text-center text-md-start">Nom de l'enfant</mat-label>
+          <mat-form-field appearance="outline" class="w-100" color="primary">
+            <input matInput id="nom{{i}}" formControlName="nom">
+          </mat-form-field>
         </div>
+        <div class="col-md-5">
+          <mat-label class="mat-subtitle-2 f-s-14 f-w-600 m-b-2 d-block text-center text-md-start">Date de naissance de l'enfant</mat-label>
+          <mat-form-field appearance="outline" class="w-100" color="primary">
+            <input matInput [matDatepicker]="picker" formControlName="anniversaire" id="aniversaire{{i}}" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="col-md-1 d-flex align-items-center justify-content-center justify-content-md-start">
+          <i class="bx bx-x fs-4 text-muted cursor-pointer" (click)="removeChild(i)"></i>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-success mt-3" (click)="addChild()">Ajouter un enfant</button>
+  </div>
+</div>
+
+
       <div class="pt-4">
         <button type="button" class="btn btn-secondary me-sm-3 me-1" (click)="prevStep()" [disabled]="currentStep === 1">Précédent</button>
-        <button type="button" class="btn btn-primary me-sm-3 me-1" (click)="nextStep()" [disabled]="currentStep === totalSteps || isStepValid(currentStep)">Suivant</button>
+        <button type="button" class="btn btn-primary me-sm-3 me-1" (click)="nextStep()" [disabled]="currentStep === totalSteps ">Suivant</button>
         <button type="submit" class="btn btn-primary" *ngIf="currentStep === totalSteps">Soumettre</button>
       </div>
     </form>

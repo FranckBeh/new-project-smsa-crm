@@ -1,9 +1,6 @@
-<mat-dialog-content [formGroup]="societeForm">
-  <mat-form-field appearance="fill">
-    <mat-label>ID Société</mat-label>
-    <input matInput formControlName="idSociete">
-  </mat-form-field>
+<!-- Dans votre fichier HTML (formulaire-societe.component.html) -->
 
+<mat-dialog-content [formGroup]="societeForm">
   <mat-form-field appearance="fill">
     <mat-label>Nom</mat-label>
     <input matInput formControlName="nom">
@@ -22,5 +19,7 @@
 
 <mat-dialog-actions>
   <button mat-button (click)="onCancel()">Annuler</button>
-  <button mat-button (click)="onSubmit()" [disabled]="!societeForm.valid">Soumettre</button>
+  <button mat-button (click)="onSubmit()" [disabled]="!societeForm.valid">
+    {{ isEditing ? 'Mettre à jour' : 'Créer' }}
+  </button>
 </mat-dialog-actions>

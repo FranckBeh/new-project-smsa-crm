@@ -1,4 +1,4 @@
-const { Model, DataTypes, Sequelize } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../../config/database.js');
 
 class Note extends Model {}
@@ -6,12 +6,13 @@ class Note extends Model {}
 Note.init({
   IdClient: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true, 
   },
   IdNote: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true 
   },
   dateNote: {
     type: DataTypes.DATE,
@@ -87,7 +88,7 @@ Note.init({
   },
   update_date: {
     type: DataTypes.DATE,
-    defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+    defaultValue: DataTypes.NOW,
   },
   isVisible: {
     type: DataTypes.BOOLEAN,

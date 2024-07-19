@@ -9,7 +9,8 @@ Societe.init({
   idSociete: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    autoIncrement: true,
   },
   nom: DataTypes.STRING(100),
   ice: DataTypes.STRING(100),

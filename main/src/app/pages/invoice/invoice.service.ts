@@ -4,13 +4,19 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { InvoicePreview, Societe } from './invoice.model';
 import { AuthService } from '../auth/auth.service';
+import { environment } from 'src/app/environment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InvoiceService {
-  private apiUrl = 'http://localhost:3000/invoices'; // L'URL de votre API backend
-  private  apiUrlSociete= 'http://localhost:3000/societes'; // L'URL de societe
+  private apiUrl = 'https://api.crm-smsa.com/invoices'; // L'URL de votre API backend
+ private apiUrlSociete = 'https://api.crm-smsa.com/societes' ; // L'URL de votre API backend
+
+
+
+// private  apiUrlSociete= environment.apiUrl + 'societes'; // L'URL de societe
+ //private apiUrl = environment.apiUrl + 'invoices';
 
   private errorSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
   private societesSubject: BehaviorSubject<Societe[]> = new BehaviorSubject<Societe[]>([]);
@@ -102,6 +108,9 @@ export class InvoiceService {
     if (params.societeName) {
       httpParams = httpParams.set('societeName', params.societeName);
     }
+    if (params.isValidated) {
+      httpParams = httpParams.set('isValidated', params.isValidated);
+    }
 
     console.log('Paramètres de recherche envoyés :', params);
     return this.http.get(`${this.apiUrl}/searchInvoices`, { params: httpParams });
@@ -126,9 +135,7 @@ export class InvoiceService {
   }
 
   deleteInvoice(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.delete(`${this.apiUrl}/delete/${id}`);
   }
 
   getExportInvoices(type: number, dateFrom: string, dateTo: string): Observable<any[]> {
@@ -150,15 +157,16 @@ export class InvoiceService {
     );
   }
 
+
   getFirstAvailableRef(type: number): Observable<any> {
     const currentYear = new Date().getFullYear();
     const url = `${this.apiUrl}/first-ref/${type}/${currentYear}`;
     return this.http.get<any>(url);
   }
-  getLastAvailableRef(type: number): Observable<any> {
+  getLastAvailableRef(type: number, idEntreprise: string): Observable<number> {
     const currentYear = new Date().getFullYear();
-    const url = `${this.apiUrl}/last-ref/${type}/${currentYear}`;
-    return this.http.get<any>(url);
+    const url = `${this.apiUrl}/last-ref/${type}/${currentYear}/${idEntreprise}`;
+    return this.http.get<number>(url);
   }
 
 
@@ -202,9 +210,30 @@ export class InvoiceService {
     return this.http.put(`${this.apiUrl}/${idInv}/validate`, {});
   }
 
+  validateInvoiceAttente(idInv: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${idInv}/validateAttente`, {});
+  }
+
+  validateInvoice2(idInv: number, paymentDate: string, paymentMode: number, paymentComment: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/validate-invoice`, { idInv, paymentDate, paymentMode, paymentComment });
+  }
+
+  validateInvoiceAttente2(idInv: number, paymentDate: string, paymentMode: number, paymentComment: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/validate-invoice-attente`, { idInv, paymentDate, paymentMode, paymentComment });
+  }
 
 
   getAllSocietes(): Observable<Societe[]> {
     return this.http.get<Societe[]>(this.apiUrlSociete);
+  }
+
+  getInvoiceStats(year?: number): Observable<any> {
+    const url = year ? `${this.apiUrl}/invoice-stats?year=${year}` : `${this.apiUrl}/invoice-stats`;
+    return this.http.get<any>(url);
+  }
+
+  getClientInvoiceStats(year?: number): Observable<any> {
+    const url = year ? `${this.apiUrl}/client-invoice-stats?year=${year}` : `${this.apiUrl}/client-invoice-stats`;
+    return this.http.get<any>(url);
   }
 }

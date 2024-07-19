@@ -9,6 +9,7 @@ router.get('/search', ClientController.searchClients);
 // Opérations de base sur les clients
 router.get('/last-id', ClientController.getLastId);
 router.get('/clients/', ClientController.getClientList);
+router.get('/AllClients/', ClientController.getAllClient);
 router.get('/count', ClientController.getClientCount);
 router.get('/:id', ClientController.getClientById);
 router.get('/clients/search', ClientController.getClientByAttributesHandler.bind(ClientController));

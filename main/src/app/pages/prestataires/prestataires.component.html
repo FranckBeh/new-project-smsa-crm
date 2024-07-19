@@ -1,1 +1,110 @@
-<p>prestataires works!</p>
+<div class="row">
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="py-3 mb-4">
+      <span class="text-muted fw-light">Prestataires /</span> Liste
+    </h4>
+    <div class="card">
+      <div class="table-responsive">
+        <!-- Header Section with Add Button and Search -->
+        <div class="row mx-1 my-3">
+          <!-- Add Prestataire Button -->
+          <div class="col-12 col-md-4 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+            <a class="btn btn-primary" [routerLink]="['/prestataires/prestataires/formulaire-prestataire']">
+              <i class="bx bx-plus me-md-1"></i>
+              <span class="d-md-inline-block d-none">Ajouter un prestataire</span>
+            </a>
+          </div>
+          <!-- Search and Export Section -->
+          <div class="col-12 col-md-8 d-flex align-items-center justify-content-end">
+            <!-- Search Section -->
+            <div class="input-group">
+              <label class="input-group-text" for="searchOption">Rechercher par</label>
+              <select class="form-select" id="searchOption" [(ngModel)]="searchOption">
+                <option value="nom">Nom</option>
+                <option value="nomResponsable">Nom Responsable</option>
+                <option value="domainesActivite">Domaines d'activité</option>
+                <option value="tags">Tags</option>
+                <option value="fonctionResponsable">Fonction Responsable</option>
+                <option value="ville">Ville</option>
+                <option value="fix">Fix</option>
+                <option value="gsm">GSM</option>
+                <option value="remarque">Remarque</option>
+                <option value="avis">Avis</option>
+                <option value="email">Email</option>
+              </select>
+              <input type="search" class="form-control" placeholder="Rechercher..." [(ngModel)]="searchQuery">
+              <button class="btn btn-primary ms-2" (click)="search()">Rechercher</button>
+            </div>
+            <div class="dropdown ms-3">
+              <button class="btn btn-secondary dropdown-toggle" type="button">
+                <i class="bx bx-export me-1"></i> Exporter
+              </button>
+              <div class="dropdown-menu p-3">
+                <button type="button" class="btn btn-primary w-100 mt-2">Exporter Prestataires</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Table Section -->
+        <div class="row mx-2 mt-3">
+          <div class="col-md-12">
+            <!-- Loading Indicator -->
+            <div *ngIf="isLoading" class="alert alert-info">Chargement...</div>
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+            <!-- Data Table -->
+            <table class="user-list-table table table-striped">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Ville</th>
+                  <th>Tél</th>
+                  <th>Email</th>
+                  <th>GSM Responsable</th>
+                  <th>Responsable</th>
+                  <th>Nbr Requêtes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let prestataire of prestataires$ | async">
+                  <td>{{ prestataire.nom }}</td>
+                  <td>{{ prestataire.villeAssociation?.nomville }}</td>
+                  <td>{{ prestataire.fix }}</td>
+                  <td>{{ prestataire.email }}</td>
+                  <td>{{ prestataire.gsmResponsable }}</td>
+                  <td>{{ prestataire.nomResponsable }}</td>
+                  <td>{{ prestataire.noteCount }}</td>
+                  <td>
+                    <div class="d-inline-block text-nowrap">
+                      <a [routerLink]="['/prestataires/prestataires/edit-prestataire', prestataire.IdPrest]" class="btn btn-sm btn-icon">
+                        <i class="bx bx-edit"></i>
+                      </a>
+                      <button class="btn btn-sm btn-icon delete-record" (click)="onDeletePrestataire(prestataire.IdPrest)">
+                        <i class="bx bx-trash"></i>
+                      </button>
+                      <a [routerLink]="['/prestataires/prestataire-detail', prestataire.IdPrest]" class="btn btn-sm btn-icon">
+                        <i class="bx bx-show mx-1"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- No Data Indicator -->
+            <div *ngIf="!isLoading && !(prestataires$ | async)?.length" class="alert alert-info">
+              Aucune donnée disponible.
+            </div>
+
+            <!-- Paginator -->
+            <mat-paginator [length]="totalPrestataires" [pageSize]="itemsPerPage" [pageSizeOptions]="[5, 10, 20]" [showFirstLastButtons]="true" (page)="onPageChange($event)">
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,23 +1,47 @@
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../../config/database.js');
+// src/models/Document.js
+const { Model, DataTypes } = require("sequelize");
+const sequelize = require("../../config/database");
 
 class Document extends Model {}
 
-Document.init({
-  IdDocument: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    allowNull: false
+Document.init(
+  {
+    IdDocument: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    IdPrest: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    nom: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    nomFichier: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    idFree: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    idInv: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    cheminFichier: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
-  IdPrest: DataTypes.INTEGER,
-  nom: DataTypes.STRING(300),
-  nomFichier: DataTypes.STRING(300),
-  idFree: DataTypes.INTEGER,
-  idInv: DataTypes.INTEGER
-}, {
-  sequelize, // instance de connexion
-  modelName: 'Document', // nom du modèle
-  tableName: 'document' // nom de la table
-});
+  {
+    sequelize,
+    modelName: "Document",
+    tableName: "document",
+    timestamps: false,
+  }
+);
 
 module.exports = Document;

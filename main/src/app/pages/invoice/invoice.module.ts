@@ -12,10 +12,11 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
+import { MatDialogModule } from '@angular/material/dialog';
+
 
 
 // Ajoutez les modules pour la pagination et l'exportation
-//import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ExportAsModule } from 'ngx-export-as';
 
 import { AppInvoiceComponent } from './invoice.component';
@@ -23,11 +24,12 @@ import { InvoiceRoutingModule } from './invoice.routing';
 import { FormulaireFactureComponent } from './formulaire-facture/formulaire-facture.component';
 import { EditFormulaireFactureComponent } from './edit-formulaire-facture/edit-formulaire-facture.component';
 import { PreviewFactureComponent } from './preview-facture/preview-facture/preview-facture.component';
+import { PaymentModalComponent } from './modal/payment-modal/payment-modal.component';
 
 @NgModule({
   imports: [
     CommonModule,
-   // RouterModule.forChild(InvoiceRoutingModule),
+
     MatCardModule,
     MatFormFieldModule,
     MatSelectModule,
@@ -42,13 +44,15 @@ import { PreviewFactureComponent } from './preview-facture/preview-facture/previ
     MatAutocompleteModule,
     MatInputModule,
    //PaginationModule.forRoot(), // Importez le module de pagination ngx-bootstrap
-    ExportAsModule // Importez le module d'exportation ngx-export-as
+    ExportAsModule, // Importez le module d'exportation ngx-export-as
+    MatDialogModule
   ],
   declarations: [
     AppInvoiceComponent,
     EditFormulaireFactureComponent,
     FormulaireFactureComponent,
     PreviewFactureComponent,
+    PaymentModalComponent,
   ]
 })
 export class InvoiceModule { }

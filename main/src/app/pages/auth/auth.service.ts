@@ -5,12 +5,15 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { environment } from 'src/app/environment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth';
+
+private apiUrl = environment.apiUrl + 'auth' || 'https://api.crm-smsa.com/auth';
+//private apiUrl='https://api.crm-smsa.com/auth';
 
   constructor(
     private http: HttpClient,
@@ -59,6 +62,10 @@ export class AuthService {
     return localStorage.getItem('userRole');
   }
 
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
@@ -74,5 +81,25 @@ export class AuthService {
 
   isAdmin(): boolean {
     return this.getUserRole() === 'Administrateur';
+  }
+
+  isNotAdmin(): boolean {
+    return this.getUserRole() !== 'Administrateur';
+  }
+  getCurrentUser(): any {
+    const token = this.getToken();
+    if (token) {
+      // Décoder le token JWT pour obtenir les informations de l'utilisateur
+      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      const userId = tokenPayload.userId; // Supposons que userId est le champ dans votre JWT pour l'identifiant de l'utilisateur
+      return { userId }; // Vous pouvez retourner d'autres informations de l'utilisateur si nécessaire
+    }
+    return null; // Retourner null si aucun token n'est trouvé ou s'il est invalide
+  }
+
+
+  isTokenExpired(token: string): boolean {
+    const expiry = (JSON.parse(atob(token.split('.')[1]))).exp;
+    return (Math.floor((new Date).getTime() / 1000)) >= expiry;
   }
 }

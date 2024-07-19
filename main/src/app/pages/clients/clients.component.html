@@ -157,6 +157,28 @@
                         aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog"
                         aria-expanded="false"><span><i class="bx bx-export me-1"></i>Export</span>
                       </button>
+                      <form #fieldSelectionForm="ngForm">
+                        <!-- ... -->
+                        <div>
+                            <mat-form-field appearance="outline" class="w-100" color="primary">
+                                <mat-label>Type de client (recherche)</mat-label>
+                                <input matInput [formControl]="searchControl" [(ngModel)]="selectedType" [matAutocomplete]="autoTypes">
+                                <mat-autocomplete #autoTypes="matAutocomplete" [displayWith]="displayType" (optionSelected)="onTypeSelected($event)">
+                                    <mat-option *ngFor="let type of filteredTypes | async" [value]="type">
+                                        {{ type.NomType }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                        <!-- La liste déroulante avec les cases à cocher ne s'affiche que si selectedType est défini -->
+                        <div *ngIf="selectedType">
+                            <label *ngFor="let field of availableFields">
+                                <input type="checkbox" [value]="field" (change)="toggleFieldSelection(field)" [checked]="selectedFields.includes(field)"> {{ field }}
+                            </label>
+                        </div>
+                        <button type="button" (click)="exportClientsByType(selectedType)">Exporter Clients</button>
+                    </form>
+
                     </div>
                   </div>
                 </div>
@@ -205,14 +227,21 @@
                             <td>{{ client.fonction || '-' }}</td>
                             <td>
                               <div class="d-inline-block text-nowrap">
-                                <button class="btn btn-sm btn-icon"><i class="bx bx-edit"></i></button>
-                                <button class="btn btn-sm btn-icon delete-record"><i class="bx bx-trash"></i></button>
+                                <button class="btn btn-sm btn-icon">
+
+                                  <a [routerLink]="['/formulaire-client', client.IdClient]">
+                                    <i class="bx bx-edit"></i></a>
+                                </button>
+
+                                <button class="btn btn-sm btn-icon delete-record" (click)="onDeleteClient(client.IdClient)"><i class="bx bx-trash"></i></button>
+
                                 <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                                   <i class="bx bx-dots-vertical-rounded me-2"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end m-0">
-                                  <a href="app-user-view-account.html" class="dropdown-item">View</a>
-                                  <a href="javascript:;" class="dropdown-item">Suspend</a>
+                                  <a [routerLink]="['/formulaire-client', client.IdClient]" class="dropdown-item">Voir</a>
+                                  <a [routerLink]="['/requests/add-requests/formulaire-requests', client.IdClient]" class="dropdown-item">Ajouter une requete</a>
+                                  <a href="javascript:;" (click)="onDeleteClient(client.IdClient)" class="dropdown-item">supprimer</a>
                                 </div>
                               </div>
                             </td>
@@ -240,14 +269,22 @@
                           <td>{{ client.fonction || '-' }}</td>
                           <td>
                             <div class="d-inline-block text-nowrap">
-                              <button class="btn btn-sm btn-icon"><i class="bx bx-edit"></i></button>
-                              <button class="btn btn-sm btn-icon delete-record"><i class="bx bx-trash"></i></button>
+                              <button class="btn btn-sm btn-icon">
+
+                                <a [routerLink]="['/clients/formulaire-client', client.IdClient]">
+                                  <i class="bx bx-edit"></i></a>
+                              </button>
+
+                              <button class="btn btn-sm btn-icon delete-record" (click)="onDeleteClient(client.IdClient)">
+                                <i class="bx bx-trash"></i>
+                              </button>
                               <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                                 <i class="bx bx-dots-vertical-rounded me-2"></i>
                               </button>
                               <div class="dropdown-menu dropdown-menu-end m-0">
-                                <a href="app-user-view-account.html" class="dropdown-item">View</a>
-                                <a href="javascript:;" class="dropdown-item">Suspend</a>
+                                <a [routerLink]="['/clients/formulaire-client', client.IdClient]" class="dropdown-item">View</a>
+                                <a [routerLink]="['/requests/add-requests/formulaire-requests', client.IdClient]" class="dropdown-item">Ajouter une requete</a>
+                                <a href="javascript:;" (click)="onDeleteClient(client.IdClient)" class="dropdown-item">supprimer</a>
                               </div>
                             </div>
                           </td>

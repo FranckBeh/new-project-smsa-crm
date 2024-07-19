@@ -46,37 +46,37 @@ export const navItems: NavItem[] = [
   },
   {
     navCap: 'Admininistration',
+    requiresAdmin: true,
   },
   {
     displayName: 'Gestion des sociétés',
     iconName: 'building',
     route: '/societe',
+    requiresAdmin: true,
   },
   {
     displayName: 'Gestion des utilisateurs',
     iconName: 'users',
     route: '/users',
+    requiresAdmin: true,
   },
   {
     displayName: 'Gestion des villes',
     iconName: 'building-community',
     route: '/villes',
+    requiresAdmin: true,
   },
   {
     displayName: 'Gestion des domaines',
     iconName: 'category',
     route: '/domaines',
+    requiresAdmin: true,
   },
   {
     displayName: 'Paramètres entreprise',
     iconName: 'settings-2',
     route: '/entreprises',
-  },
-
-  {
-    displayName: 'Register',
-    iconName: 'user-plus',
-    route: '/authentication/register',
+    requiresAdmin: true,
   },
 
 ];

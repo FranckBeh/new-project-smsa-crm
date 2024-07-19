@@ -1,0 +1,27 @@
+/* Couleur marron foncé */
+.text-dark-brown {
+  color: #5D4037; /* Marron foncé */
+}
+
+/* Cadre pour les sections */
+.info-card {
+  border: 1px solid #DDDDDD; /* Contour léger */
+  border-radius: 5px;
+  background-color: #FAFAFA; /* Fond léger */
+}
+
+/* Style pour le corps de la carte */
+.card-body {
+  background-color: #F5F5DC; /* Beige */
+}
+
+/* Style pour le titre de la carte */
+.card-title {
+  text-transform: uppercase; /* Majuscules */
+  display: flex;
+  align-items: center;
+}
+
+.card-title i {
+  margin-right: 10px; /* Espacement à droite de l'icône */
+}

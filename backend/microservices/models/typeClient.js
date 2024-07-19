@@ -8,7 +8,8 @@ TypeClient.init({
   NumType: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    autoIncrement: true,
   },
   NomType: {
     type: DataTypes.STRING(100),

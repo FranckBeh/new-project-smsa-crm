@@ -19,7 +19,7 @@ Client.init({
     type: DataTypes.DATE,
     defaultValue: new Date('1990-01-01 00:00:00')
   },
-  societe_id: DataTypes.STRING(765),
+  societe_id: DataTypes.INTEGER,
   civilite: DataTypes.STRING(765),
   fonction: DataTypes.STRING(765),
   satisfaction: DataTypes.STRING(765),

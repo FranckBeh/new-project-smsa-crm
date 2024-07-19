@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Informations de paiement</h2>
+<mat-dialog-content [formGroup]="paymentForm">
+  <div class="row">
+    <div class="col-md-6">
+      <label for="paymentDate" class="form-label">Date de paiement :</label>
+      <input type="date" id="paymentDate" formControlName="paymentDate" class="form-control" required>
+    </div>
+    <div class="col-md-6">
+      <label for="paymentMode" class="form-label">Moyen de paiement :</label>
+      <select id="paymentMode" formControlName="paymentMode" class="form-select" required>
+        <option value="" disabled selected>Sélectionnez un Moyen de paiement</option>
+        <option value="0">Cash</option>
+        <option value="1">Chèque</option>
+        <option value="2">Effet</option>
+        <option value="3">Carte bancaire</option>
+        <option value="4">Virement</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label for="paymentComment" class="form-label">Commentaire :</label>
+      <textarea id="paymentComment" formControlName="paymentComment" class="form-control"></textarea>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button class="btn btn-danger" mat-button (click)="onCancel()">Annuler</button>
+  <button class="btn btn-success" mat-button (click)="onSubmit()">Valider</button>
+</mat-dialog-actions>

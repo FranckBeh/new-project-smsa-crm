@@ -3,12 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Entreprise } from './entreprises.model';
+import { environment } from 'src/app/environment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntrepriseService {
-  private apiUrl = 'http://localhost:3000/companies';
+ private apiUrl = 'https://api.crm-smsa.com/companies';
+
+// private apiUrl = environment.apiUrl + 'companies' || 'https://api.crm-smsa.com/companies';
+
 
   private entrepriseSource = new BehaviorSubject<Entreprise | null>(null);
   entrepriseSelectionnee = this.entrepriseSource.asObservable();
@@ -55,6 +59,6 @@ export class EntrepriseService {
       catchError(this.handleError)
     );
   }
-  
-  
+
+
 }

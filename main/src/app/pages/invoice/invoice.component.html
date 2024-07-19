@@ -5,7 +5,7 @@
 
     <div class="container-xxl flex-grow-1 container-p-y">
       <h4 class="py-3 mb-4">
-        <span class="text-muted fw-light">Facture /</span> List
+        <span class="text-muted fw-light">Facture /</span> Liste
       </h4>
 
       <!-- Invoice List Widget -->
@@ -15,7 +15,7 @@
           <div class="card-body card-widget-separator">
             <div
               class="dt-action-buttons text-md-start mt-md-0 mb-3 d-flex align-items-center"
-            >
+            > <div class="col-md-7">
               <span class="me-2 d-md-inline-block d-none text-primary">
                 <i class="fas fa-file-alt"></i>
               </span>
@@ -28,7 +28,8 @@
                   [(ngModel)]="selectedEntreprise"
                   (change)="onEnterpriseSelected()"
                 >
-                  <option value="" disabled selected>
+
+                  <option value="" selected>
                     Choisissez une entreprise
                   </option>
                   <option
@@ -41,13 +42,27 @@
               </div>
             </div>
 
+              <div class="col-md-5">
+                <label for="year" class="d-md-inline-block d-none me-2">Etat des factures par année</label>
+                <div class="dt-buttons btn-group flex-wrap">
+                  <select [(ngModel)]="selectedYear" (change)="loadStats()" class="form-select">
+                    <option value="" selected>toutes les années</option>
+                    <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+                  </select>
+                </div>
+
+              </div>
+            </div>
+
             <div class="row gy-4 gy-sm-1">
+
+
               <div class="col-sm-6 col-md-6 col-lg-3">
                 <div
                   class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0"
                 >
                   <div>
-                    <h3 class="mb-1">24</h3>
+                    <h3 class="mb-1">{{ totalClientCount }}</h3>
                     <p class="mb-0">Clients</p>
                   </div>
                   <div class="avatar me-sm-4">
@@ -63,8 +78,8 @@
                   class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-3 pb-sm-0"
                 >
                   <div>
-                    <h3 class="mb-1">165</h3>
-                    <p class="mb-0">Invoices</p>
+                    <h3 class="mb-1">{{ creanceCount }}</h3>
+                    <p class="mb-0">Facture(s) en créance</p>
                   </div>
                   <div class="avatar me-lg-4">
                     <span class="avatar-initial rounded bg-label-secondary">
@@ -79,8 +94,8 @@
                   class="d-flex justify-content-between align-items-start border-end pb-3 pb-sm-0 card-widget-3"
                 >
                   <div>
-                    <h3 class="mb-1">$2.46k</h3>
-                    <p class="mb-0">Paid</p>
+                    <h3 class="mb-1">{{ paidValidatedCount }}</h3>
+                    <p class="mb-0">Facture(s) payée(s)</p>
                   </div>
                   <div class="avatar me-sm-4">
                     <span class="avatar-initial rounded bg-label-secondary">
@@ -92,8 +107,8 @@
               <div class="col-sm-6 col-md-6 col-lg-3">
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
-                    <h3 class="mb-1">$876</h3>
-                    <p class="mb-0">Unpaid</p>
+                    <h3 class="mb-1">{{ pendingValidationCount }}</h3>
+                    <p class="mb-0">Facture(s) en attente de validation</p>
                   </div>
                   <div class="avatar">
                     <span class="avatar-initial rounded bg-label-secondary">
@@ -112,10 +127,11 @@
         <div class="card-datatable table-responsive">
           <div
             id="DataTables_Table_0_wrapper"
-            class="dataTables_wrapper dt-bootstrap5 no-footer"
+            class="dataTables_wrapper dt-bootstrap5 no-footer m-3"
           >
-            <div class="row mx-1">
-              <div>
+          <a href="#search" class="btn btn-primary" data-bs-toggle="collapse">Faire une recherche</a>
+            <div class="row mx-1" >
+              <div id="search" class="collapse">
                 <form (ngSubmit)="onSearch(searchParams)" class="w-100">
                   <!-- Première ligne du formulaire -->
                   <div class="col-12">
@@ -142,19 +158,20 @@
                       <!-- Filtre par état -->
                       <div class="col-md-4">
                         <label for="etat">Recherche par état de facture</label>
-                        <select
-                          id="UserRole"
-                          class="form-select"
-                          [(ngModel)]="searchParams.etat"
-                          name="etat"
-                        >
-                          <option value=""  selected>
-                            Facture payée ou en créance
-                          </option>
+                        <select id="UserRole" class="form-select" [(ngModel)]="searchParams.etat" name="etat">
+                          <option value="" selected>Facture payée ou en créance</option>
                           <option value="1">Payée</option>
                           <option value="0">Créance</option>
                         </select>
+                      
+                        <select *ngIf="searchParams.etat === '1'" id="UserRole" class="form-select"
+                                [(ngModel)]="searchParams.isValidated" name="isValidated">
+                          <option value="" selected>Facture payée validée ou en attente</option>
+                          <option value="1">Payée validée</option>
+                          <option value="0">Payée en attente</option>
+                        </select>
                       </div>
+                      
                       <!-- Filtre par entreprise gérée -->
                       <div class="col-md-4">
                         <label for="company"
@@ -234,8 +251,11 @@
                   <div class="col-12">
                     <div class="row justify-content-end">
                       <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary m-3" >
                           Rechercher
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                          Réinitialiser
                         </button>
                       </div>
                     </div>
@@ -306,7 +326,7 @@
                     {{ invoice.paymentDate | date : "mediumDate" || "--" }}
                   </td>
                   <td>
-                    {{ getPaymentModeText(invoice.paymentMode) || "Impayé" }}
+                    {{ getPaymentModeText(invoice.paymentMode, invoice.isValidated) || "Impayé" }}
                   </td>
 
                   <td>
@@ -343,26 +363,39 @@
                           ><i class="bx bx-dots-vertical-rounded"></i
                         ></a>
                         <div class="dropdown-menu dropdown-menu-end">
-                          <a href="javascript:;" class="dropdown-item"
-                            >Download</a
-                          >
+
                           <a *ngIf="authService.isAdmin()"
                             [routerLink]="[
                               '/invoice/edit-formulaire-facture',
                               invoice.idInv
                             ]"
                             class="dropdown-item"
-                            >Edit</a
+                            >Modifier</a
                           >
-                          <a href="javascript:;" class="dropdown-item"
-                            >Duplicate</a
-                          >
+
                           <div class="dropdown-divider"></div>
-                          <a *ngIf="authService.isAdmin()"
-                            href="javascript:;"
-                            class="dropdown-item delete-record text-danger"
-                            >Delete</a
-                          >
+                          <a *ngIf="authService.isAdmin()" class="dropdown-item delete-record text-danger"
+                          href="javascript:;"
+                          (click)="deleteInvoice(invoice.idInv)">Delete</a>
+                          <div *ngIf="!authService.isAdmin()">
+                            <div *ngIf="invoice.type == 1 && invoice.etat == 0 && invoice.isValidated == 0">
+                              <a class="dropdown-item delete-record text-danger"
+                                 href="javascript:;"
+                                 (click)="validerEnAttente(invoice.idInv)">
+                                 Passer Payée en attente
+                              </a>
+                          </div>
+                          </div>
+                          <div *ngIf=" authService.isAdmin()">
+                            <div *ngIf="invoice.type == 1 && (invoice.etat == 1 || invoice.etat ==0) && invoice.isValidated == 0">
+                              <a class="dropdown-item delete-record text-danger"
+                                 href="javascript:;"
+                                 (click)="validerFacture(invoice.idInv)">
+                                  Valider la Facture
+                              </a>
+                          </div>
+                          </div>
+                      
                         </div>
                       </div>
                     </div>

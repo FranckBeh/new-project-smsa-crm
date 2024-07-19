@@ -1,0 +1,17 @@
+.table {
+  margin-top: 20px;
+}
+
+.pagination {
+  justify-content: center;
+}
+
+.page-item.disabled .page-link {
+  cursor: not-allowed;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}

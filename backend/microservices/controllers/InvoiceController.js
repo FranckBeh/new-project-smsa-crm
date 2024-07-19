@@ -199,7 +199,7 @@ class InvoiceController {
   // searchInvoices function in your backend
   async searchInvoices(req, res) {
     try {
-      const { company, type, etat, reference, startDate, endDate, fixedDate, societeName } = req.query;
+      const { company, type, etat, reference, startDate, endDate, fixedDate, societeName, isValidated } = req.query;
   
       // Définir les clauses where et include
       const whereClause = [];
@@ -216,6 +216,9 @@ class InvoiceController {
       }
       if (reference) {
         whereClause.push({ reference: reference });
+      }
+      if (isValidated){
+        whereClause.push({ isValidated: isValidated});
       }
       if (fixedDate) {
         whereClause.push({ date: fixedDate });
@@ -276,6 +279,9 @@ class InvoiceController {
         attributes: [
           'idInv',
           'reference',
+          'type',
+          'etat',
+          'isValidated',
           [
             Sequelize.literal(
               '(case when (Invoice.idSociete=0) then 1 else Invoice.idSociete end)'
@@ -314,7 +320,7 @@ class InvoiceController {
           ? articlesData[0].totalQuantite
           : 0;
         invoice.dataValues.totalTTC =
-          (articlesData[0] ? articlesData[0].totalTTC : 0) + invoice.tva;
+          (articlesData[0] ? articlesData[0].totalTTC : 0) ;
         invoice.dataValues.totalTVA = invoice.tva;
       }
   
@@ -329,7 +335,7 @@ class InvoiceController {
 
  async validateInvoiceById(req, res) {
   try {
-    console.log('Requête reçue avec les données suivantes:', req.body); // Affiche les données du corps de la requête
+  //  console.log('Requête reçue avec les données suivantes:', req.body); // Affiche les données du corps de la requête
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -337,15 +343,23 @@ class InvoiceController {
     }
 
     const { idInv } = req.params;
-    console.log('Validation de la facture avec idInv:', idInv); // Affiche l'ID de la facture
+    //console.log('Validation de la facture avec idInv:', idInv); // Affiche l'ID de la facture
 
     // Mettre à jour la facture spécifique avec isValided à 1 si etat est égal à 1
     const result = await Invoice.update(
-      { isValidated: 1 },
-      { where: { idInv: idInv, etat: 1 } }
-    );
+      { etat: 1, isValidated: 1 }, // Mettre à jour l'état à 1 et isValidated à 1
+      {
+          where: {
+              idInv: idInv,
+              etat: {
+                  [Sequelize.Op.or]: [0, 1] // Condition pour etat = 0 ou etat = 1
+              }
+          }
+      }
+  );
+  
 
-    console.log('Résultat de la mise à jour:', result); // Affiche le résultat de la mise à jour
+  //  console.log('Résultat de la mise à jour:', result); // Affiche le résultat de la mise à jour
 
     if (result[0] > 0) {
       res.json({ message: 'La facture a été validée avec succès.' });
@@ -353,11 +367,65 @@ class InvoiceController {
       res.status(404).json({ message: 'Facture non trouvée ou déjà validée.' });
     }
   } catch (error) {
-    console.error('Erreur lors de la validation de la facture :', error);
+   // console.error('Erreur lors de la validation de la facture :', error);
     res.status(500).json({ message: 'Erreur serveur.' });
   }
 }
   
+async validateInvoiceAttenteById(req, res) {
+  try {
+   // console.log('Requête reçue avec les données suivantes:', req.body); // Affiche les données du corps de la requête
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { idInv } = req.params;
+  //  console.log('Validation de la facture avec idInv:', idInv); // Affiche l'ID de la facture
+
+    // Mettre à jour la facture spécifique en payée en attente
+
+    const result = await Invoice.update(
+      { etat: 1 },
+      { where: { idInv: idInv} }
+    );
+
+   // console.log('Résultat de la mise à jour:', result); // Affiche le résultat de la mise à jour
+
+    if (result[0] > 0) {
+      res.json({ message: 'La facture a été validée avec succès.' });
+    } else {
+      res.status(404).json({ message: 'Facture non trouvée ou déjà validée.' });
+    }
+  } catch (error) {
+  //  console.error('Erreur lors de la validation de la facture :', error);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+}
+
+async validateInvoice2 (req, res){
+  const { idInv, paymentDate, paymentMode, paymentComment } = req.body;
+  try {
+    // Mise à jour de la facture dans la base de données
+    await Invoice.update({ isValidated: 1, paymentDate, paymentMode, paymentComment,etat: 1 }, { where: { idInv } });
+    res.status(200).send({ message: 'Facture validée avec succès' });
+  } catch (error) {
+    res.status(500).send({ message: 'Erreur lors de la validation de la facture', error });
+  }
+};
+
+async validateInvoiceAttente2 (req, res) {
+  const { idInv, paymentDate, paymentMode, paymentComment } = req.body;
+  try {
+    // Mise à jour de la facture dans la base de données
+    await Invoice.update({ etat: 1, paymentDate, paymentMode, paymentComment }, { where: { idInv } });
+    res.status(200).send({ message: 'Facture mise en attente avec succès' });
+  } catch (error) {
+    res.status(500).send({ message: 'Erreur lors de la mise en attente de la facture', error });
+  }
+};
+
   
   
   
@@ -463,7 +531,7 @@ class InvoiceController {
           ? articlesData[0].totalQuantite
           : 0;
         invoice.dataValues.totalTTC =
-          (articlesData[0] ? articlesData[0].totalTTC : 0) + invoice.tva;
+          (articlesData[0] ? articlesData[0].totalTTC : 0);
         invoice.dataValues.totalTVA = invoice.tva; // Utiliser la valeur de la TVA directement depuis l'attribut tva de la facture
         //  invoice.dataValues.totalTTC += invoice.dataValues.totalTVA;
       }
@@ -660,7 +728,7 @@ class InvoiceController {
 
       // Arrondir le nombre total d'articles et le total TTC à deux décimales
       invoice.dataValues.nbrArticles = Number(nbrArticles.toFixed(2));
-      invoice.dataValues.totalTTC = Number((totalTTC + invoice.tva).toFixed(2));
+      invoice.dataValues.totalTTC = Number((totalTTC).toFixed(2));
 
       res.json(invoice);
     } catch (error) {

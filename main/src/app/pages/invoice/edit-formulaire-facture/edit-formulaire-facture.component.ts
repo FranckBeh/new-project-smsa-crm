@@ -95,7 +95,7 @@ export class EditFormulaireFactureComponent implements OnInit {
   isDataLoaded: boolean = false;
   ngOnInit(): void {
     this.invoiceIdInv = +this.route.snapshot.params['id'];
-   this.loadInvoiceData(this.invoiceIdInv);
+   //this.loadInvoiceData(this.invoiceIdInv);
     this.userId = this.authService.getUserId();
     this.addArticle();
     this.loadSocietes();
@@ -126,30 +126,20 @@ export class EditFormulaireFactureComponent implements OnInit {
         const articleIds = invoice.listinvart.map((article: { idArticle: number; }) => article.idArticle);
 
         const creationDate = new Date(invoice.dateCreation); // Convertir la date en objet Date
-        let tvaRate = (invoice.tva/ (invoice.totalTTC -invoice.tva ))*100;
-        //tvaRate = parseFloat(tvaRate.toFixed(2));
-console.log('tva%', tvaRate)
-// Déterminez quelle option sélectionner en fonction du taux de TVA arrondi
-let tvaRateOptionValue = '';
-if (tvaRate >= 19 && tvaRate <= 20) {
-  tvaRateOptionValue = '0.20';
-} else if (tvaRate >= 14 && tvaRate <= 18) {
-  tvaRateOptionValue = '0.18';
-} else {
-  tvaRateOptionValue = '0.0';
-}
-        if(invoice.nc===1){
-          this.societeId = 0;
-        } else{
-          this.societeId = invoice.nc
-        }
+       // Calcul de tvaRate
+//let tvaRate = (invoice.tva / (invoice.totalTTC - invoice.tva)) * 100;
+let tvaRate = invoice.tva;
+// Arrondissement à deux décimales
+let tvaRateOptionValue = tvaRate.toFixed(2);
+
+this.societeId = invoice.nc === 1 ? 0 : invoice.nc;
         // Formater la date au format "yyyy-MM-dd"
         const formattedDate = this.formatDate(creationDate);
         this.editInvoiceForm.patchValue({
-          adresseEntreprise: invoice.adresseEntreprise,
+          adresseEntreprise: invoice.adresseSociete,
           invoiceState: invoice.type,
           etatState: invoice.etat,
-          isProForma: invoice.isProForma,
+          isProForma: invoice.isProFormat,
           reference: invoice.reference,
           societe: this.societeId,
           adresseParticulier: invoice.adresseSociete,
@@ -157,9 +147,10 @@ if (tvaRate >= 19 && tvaRate <= 20) {
           creationDate: formattedDate,
           note: invoice.note,
           tvaRate: tvaRateOptionValue,
+         // tvaRate: invoice.tva,
           paymentDate: invoice.paymentDate,
-          paymentMethod: invoice.paymentMethod,
-          comment: invoice.comment,
+          paymentMethod: invoice.paymentMode,
+          comment: invoice.paymentComment,
           totalHT: invoice.totalHT,
           totalTVA: invoice.tva,
           totalTTC: invoice.totalTTC,
@@ -197,18 +188,17 @@ if (tvaRate >= 19 && tvaRate <= 20) {
       }
     );
 
-    this.editInvoiceForm.get('invoiceState')?.valueChanges.subscribe((type) => {
-      // Vérifiez si les données sont chargées avant de réagir aux changements
-      if (this.isDataLoaded && type) {
-        // Logique pour obtenir la première référence disponible pour le type sélectionné
-        this.invoiceService.getLastAvailableRef(type).subscribe((ref) => {
-          // Mettez à jour le contrôle de formulaire 'reference' avec la référence obtenue
+    this.editInvoiceForm.get('invoiceState')?.valueChanges.subscribe(type => {
+      if (type) {
+        const idEntreprise = this.invoice.major; // Replace with the actual ID
+        this.invoiceService.getLastAvailableRef(type, idEntreprise).subscribe(ref => {
           this.editInvoiceForm.patchValue({
-            reference: ref,
+            reference: ref
           });
         });
       }
     });
+
 
   }
 
@@ -227,53 +217,7 @@ if (tvaRate >= 19 && tvaRate <= 20) {
     return `${year}-${month}-${day}`;
   }
 
-  loadInvoiceData(invoiceIdInv: number): void {
-    // Utilisez votre service pour récupérer les données de la facture
-    this.invoiceService
-      .getInvoiceDataById2(invoiceIdInv)
-      .subscribe((invoiceData) => {
-        this.editInvoiceForm = this.fb.group({
-          nomEntreprise: [invoiceData.parametreCompanie.nomCompanie, Validators.required],
-          idEntreprise: [invoiceData.major, Validators.required],
-          invoiceState: [invoiceData.type, Validators.required],
-          etatState: [invoiceData.etat],
-          isProForma: [invoiceData.isProForma],
-          reference: [invoiceData.reference, Validators.required],
-          creationDate: [invoiceData.creationDate, Validators.required],
-          paymentDate: [invoiceData.paymentDate],
-          paymentMethod: [invoiceData.paymentMethod],
-          comment: [invoiceData.comment],
-          societeControl: [invoiceData.societeControl],
-          nomSociete: [invoiceData.nomSociete],
-          adresseEntreprise: [invoiceData.adresseEntreprise],
-          tvaRate: [invoiceData.tvaRate],
-          note: [invoiceData.note],
-          articles: this.fb.array(
-            invoiceData.articles.map(
-              (article: {
-                designation: string;
-                priceSale: number;
-                quantity: number;
-              }) =>
-                this.fb.group({
-                  designation: [article.designation, Validators.required],
-                  priceSale: [
-                    article.priceSale,
-                    [Validators.required, Validators.min(1)],
-                  ],
-                  quantity: [
-                    article.quantity,
-                    [Validators.required, Validators.min(1)],
-                  ],
-                })
-            )
-          ),
-          totalHT: [invoiceData.totalHT],
-        totalTVA: [invoiceData.totalTVA],
-        totalTTC: [invoiceData.totalTTC],
-        });
-      });
-  }
+
 
   loadEntreprises(): void {
     this.entrepriseService.entrepriseSelectionnee.subscribe((data) => {
@@ -377,13 +321,7 @@ if (tvaRate >= 19 && tvaRate <= 20) {
     return this.articles.at(index)?.get(field) as FormControl;
   }
 
-  updateTotals(): void {
-    this.totalTTC = this.getTotalTTC1();
-    this.totalTVA = this.getTotalTVA();
 
-    // Mise à jour des valeurs dans le formulaire
-
-  }
 
   getTotalTTC(i: number): number {
     const article = this.articles.at(i);
@@ -412,13 +350,12 @@ if (tvaRate >= 19 && tvaRate <= 20) {
     }
 
     // Récupérer le taux de TVA sélectionné par l'utilisateur
-    const tvaPercentage = parseFloat(
-      this.editInvoiceForm.get('tvaRate')?.value
-    );
-
+   // const tvaPercentage = parseFloat(this.editInvoiceForm.get('tvaRate')?.value) / 100;
+   // const tvaPercentage = parseFloat(this.editInvoiceForm.get('tvaRate')?.value) ;
     // Appliquer la TVA à la somme totale
-    const totalTVA = totalHT * tvaPercentage;
-    const totalTTC = totalHT + totalTVA;
+   // const totalTVA = totalHT * tvaPercentage;
+   //const totalTTC = totalHT + totalTVA;
+    const totalTTC = totalHT;
 
     return totalTTC;
   }
@@ -428,11 +365,13 @@ if (tvaRate >= 19 && tvaRate <= 20) {
     const totalHT = this.getTotalGeneralHT();
 
     // Récupérer le taux de TVA sélectionné par l'utilisateur
-    const tvaPercentage =
-      parseFloat(this.editInvoiceForm.get('tvaRate')?.value) || 0;
+  //  const tvaPercentage = parseFloat(this.editInvoiceForm.get('tvaRate')?.value) / 100 || 0;
+  const tvaPercentage =
+  parseFloat(this.editInvoiceForm.get('tvaRate')?.value);
 
     // Calculer le montant de la TVA
-    const totalTVA = totalHT * tvaPercentage;
+    //const totalTVA = totalHT * tvaPercentage;
+    const totalTVA = tvaPercentage;
     return totalTVA;
   }
 
@@ -449,87 +388,100 @@ if (tvaRate >= 19 && tvaRate <= 20) {
   }
 
 
+  updateTotals(): void {
+    this.totalTTC = this.getTotalTTC1();
+    this.totalTVA = this.getTotalTVA();
 
+    // Mise à jour des valeurs dans le formulaire
+
+  }
 
   onSubmit(): void {
     if (this.authService.isAdmin()) {
-if (this.editInvoiceForm.valid) { // Assurez-vous que le formulaire est valide
-      const formValue = this.editInvoiceForm.value;
-
-      // Mise à jour des valeurs du formulaire pour les totaux
-      this.updateTotals();
-
-
-      // Préparation des articles avec les ID corrects
-      const articlesWithIds = formValue.articles.map((article: { idArticle: any;designation: string; quantity: number; priceSale: number; }, index: any) => ({
-        designation: article.designation,
-        quantite: article.quantity,
-        postPrixUnit: article.priceSale,
-        autreQuantite: 1,
-        idArticle: article.idArticle || null // Utilisez l'ID existant ou null pour les nouveaux articles
-      }));
-
-      // Création de l'objet data pour la mise à jour
-      const data: InvoiceCopy = {
-        ...formValue,
-        reference: formValue.reference,
-        type: formValue.invoiceState,
-        etat: formValue.etatState,
-        isProFormat: formValue.isProForma,
-        paymentMode: formValue.paymentMethod,
-        //isValidated: formValue.paymentDate ? 1 : 0,
-        paymentComment: formValue.comment,
-        paymentDate: formValue.paymentDate,
-        date: formValue.creationDate,
-        tva: this.totalTVA,
-        totalTVA: formValue.tvaRate,
-        footer: formValue.note,
-        idSociete: formValue.societe,
-        adresseSociete: formValue.adresseEntreprise,
-        autreSociete: formValue.nomSociete,
-        autreQuantiteTitle: null,
-        idUser: this.userId,
-        totalTTC: this.totalTTC,
-        major: formValue.idEntreprise,
-        articles: articlesWithIds,
-      };
-
-
-
-      console.log('les données à modifier', data);
-
-      // Appel du service pour mettre à jour la facture
-      this.invoiceService.updateInvoice(this.invoiceIdInv, data).subscribe(
-        response => {
-          console.log('La facture a été mise à jour avec succès', response);
-          // Gestion de la réponse réussie
-        // Afficher le modal
-        this.dialog.open(DialogComponent, {
-          data: {
-            message: 'Facture Mise à jour avec succès'
+      if (this.editInvoiceForm.valid) {
+        const formValue = this.editInvoiceForm.value;
+  
+        // Mise à jour des valeurs du formulaire pour les totaux
+        this.updateTotals();
+  
+  
+        // Préparation des articles avec les ID corrects
+        const articlesWithIds = formValue.articles.map((article: { idArticle: any; designation: string; quantity: number; priceSale: number; }, index: any) => ({
+          designation: article.designation,
+          quantite: article.quantity,
+          postPrixUnit: article.priceSale,
+          autreQuantite: 1,
+          idArticle: article.idArticle || null // Utilisez l'ID existant ou null pour les nouveaux articles
+        }));
+  
+        // Réinitialiser les champs si invoice.etat est égal à 0
+        if (formValue.etatState == 0) {
+          formValue.paymentDate = null;
+          formValue.paymentMethod = null;
+          formValue.comment = '';
+        }
+  
+        // Création de l'objet data pour la mise à jour
+        const data: InvoiceCopy = {
+          ...formValue,
+          reference: formValue.reference,
+          type: formValue.invoiceState,
+          etat: formValue.etatState,
+          isProFormat: formValue.isProForma,
+          paymentMode: formValue.paymentMethod,
+          isValidated: formValue.etatState === 1 ? 1 : 0,
+          paymentComment: formValue.comment,
+          paymentDate: formValue.paymentDate,
+          date: formValue.creationDate,
+          tva: formValue.tvaRate,
+          totalTVA: formValue.tvaRate,
+          footer: formValue.note,
+          idSociete: formValue.societe,
+          adresseSociete: formValue.adresseEntreprise,
+          autreSociete: formValue.nomSociete,
+          autreQuantiteTitle: null,
+          idUser: this.userId,
+          totalTTC: this.totalTTC,
+          major: formValue.idEntreprise,
+          articles: articlesWithIds,
+        };
+  
+        // Appel du service pour mettre à jour la facture
+        this.invoiceService.updateInvoice(this.invoiceIdInv, data).subscribe(
+          response => {
+            // Afficher le modal de succès
+            this.dialog.open(DialogComponent, {
+              data: {
+                message: 'Facture Mise à jour avec succès'
+              }
+            });
+  
+            // Rediriger vers le composant principal
+            this.router.navigate(['/invoice']);
+          },
+          error => {
+            // Gestion des erreurs de soumission
+            console.error('Erreur lors de la modification de la facture:', error);
+            this.dialog.open(DialogComponent, {
+              data: {
+                message: 'Erreur lors de la modification de la facture'
+              }
+            });
           }
-        });
-
-        // Rediriger vers le composant principal
-        this.router.navigate(['/invoice']);
-      },
-      error => {
-        // Gestion des erreurs de soumission
-        console.error('Erreur lors de la modificiation de la facture:', error);
+        );
+      } else {
+        // Gestion du formulaire invalide
+        console.error("Le formulaire n'est pas valide");
         this.dialog.open(DialogComponent, {
           data: {
-            message: 'Erreur lors de la modificiation de la facture'
+            message: "Le formulaire n'est pas valide"
           }
         });
       }
-      );
     } else {
-      console.error("Le formulaire n'est pas valide");
-      // Gestion du formulaire invalide
+      alert('Vous n\'êtes pas autorisé');
     }
-    }else('Vous etes pas autorisé')
-    
   }
-
+  
 
 }

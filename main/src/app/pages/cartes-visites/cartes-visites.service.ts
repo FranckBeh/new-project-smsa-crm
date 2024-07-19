@@ -6,13 +6,18 @@ import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } f
 
 // Importez l'interface CarteVisites (en supposant qu'elle soit définie ailleurs)
 import { CarteVisites } from './carte-visites.model';
+import { environment } from 'src/app/environment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CarteVisiteService  {
 
-  private apiUrl = 'http://localhost:3000/cartesvisites'; // Remplacez par l'URL réelle de votre API
+ private apiUrl = 'https://api.crm-smsa.com/cartesvisites';
+
+// private apiUrl = environment.apiUrl + 'cartesvisites' || 'https://api.crm-smsa.com/cartesvisites';
+
+
   private carteVisitesSubject: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
   public carteVisites$: Observable<any[]> = this.carteVisitesSubject.asObservable();
 

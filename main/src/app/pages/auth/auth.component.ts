@@ -28,13 +28,20 @@ export class AuthComponent  {
   login(): void {
     this.authService.login(this.loginData).subscribe(
       () => {
-      //  console.log('Login successful');
-        this.router.navigate(['/dashboard']); // Redirige vers le tableau de bord
+        // Redirige vers le tableau de bord
+        this.router.navigate(['/dashboard']);
       },
       error => {
-       // console.error('Login failed:', error);
         // Afficher un message d'erreur à l'utilisateur si la connexion échoue
-        this.errorMessage = 'La connexion a échoué. Veuillez réessayer.';
+        if (error.status === 404) {
+          this.errorMessage = 'Login incorrect.';
+        } else if (error.status === 403) {
+          this.errorMessage = 'Utilisateur non autorisé.';
+        } else if (error.status === 401) {
+          this.errorMessage = 'Mot de passe incorrect.';
+        } else {
+          this.errorMessage = 'La connexion a échoué. Veuillez réessayer.';
+        }
       }
     );
   }

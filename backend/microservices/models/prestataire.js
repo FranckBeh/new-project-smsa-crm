@@ -7,7 +7,8 @@ Prestataire.init({
   IdPrest: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    autoIncrement: true
   },
   priorite: {
     type: DataTypes.FLOAT,
@@ -37,10 +38,23 @@ Prestataire.init({
     type: DataTypes.INTEGER,
     defaultValue: 0
   }
+  ,
+   // Timestamps
+   createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    allowNull: false
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    allowNull: false
+  },
 }, {
   sequelize,
   modelName: 'Prestataire',
   tableName: 'prestataire',
+  timestamps: true, // Indique à Sequelize d'utiliser les timestamps
 
 });
 

@@ -43,6 +43,11 @@ router.delete('/invoices/:id/commentaires', InvoiceController.deleteAllCommentai
 // Route pour valider une facture spécifique en utilisant PATCH
 //router.patch('/validate/:idInv', InvoiceController.validateInvoice);
 router.put('/:idInv/validate', InvoiceController.validateInvoiceById);
+router.put('/:idInv/validateAttente', InvoiceController.validateInvoiceAttenteById);
+// Route pour valider une facture
+router.post('/validate-invoice', InvoiceController.validateInvoice2);
+// Route pour mettre une facture en attente
+router.post('/validate-invoice-attente', InvoiceController.validateInvoiceAttente2);
 
 // stat
 router.get('/invoice-stats', InvoiceController.getInvoiceStats);

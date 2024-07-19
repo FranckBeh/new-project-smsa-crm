@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewEncapsulation,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { InvoiceService } from './invoice.service';
 import { EntrepriseService } from './../entreprises/entreprises.service';
 import { Invoice } from './invoice.model';
@@ -7,6 +14,9 @@ import { Subscription } from 'rxjs';
 import { Entreprise } from '../entreprises/entreprises.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import { DialogComponent } from 'src/app/layouts/dialog/dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { PaymentModalComponent } from './modal/payment-modal/payment-modal.component';
 
 @Component({
   selector: 'app-invoice',
@@ -15,10 +25,11 @@ import { AuthService } from '../auth/auth.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class AppInvoiceComponent implements OnInit, OnDestroy {
-  @Output() EnterpriseSelected: EventEmitter<Entreprise> = new EventEmitter<Entreprise>();
+  @Output() EnterpriseSelected: EventEmitter<Entreprise> =
+    new EventEmitter<Entreprise>();
 
   entreprises: any[] = [];
-  selectedEntreprise: Entreprise ;
+  selectedEntreprise: Entreprise;
   invoices: Invoice[] = [];
   selectedInvoice: Invoice | null = null;
   isNewInvoice = false;
@@ -43,9 +54,20 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
     startDate: '',
     endDate: '',
     fixedDate: '',
-    societeName: '' // Nouveau champ pour la recherche par nom de société
+    societeName: '', // Nouveau champ pour la recherche par nom de société
+    isValidated: '',
   };
   isLoading = false; // Variable pour indiquer le chargement
+  creanceCount: number;
+  pendingValidationCount: number;
+  paidValidatedCount: number;
+  errorMessage: string;
+  registeredClientCount: number;
+  unregisteredClientCount: number;
+  totalClientCount: number;
+
+  years: number[] = [];
+  selectedYear: number;
 
   invoiceTypes: string[] = [
     'Factures Payées',
@@ -76,20 +98,28 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private entrepriseService: EntrepriseService,
     private router: Router,
+    private dialog: MatDialog,
     private route: ActivatedRoute,
-    public authService: AuthService,
-  ) {}
+    public authService: AuthService
+  ) {
+    const currentYear = new Date().getFullYear();
+    const startYear = 2015; // Année de départ
+    for (let year = startYear; year <= currentYear; year++) {
+      this.years.push(year);
+    }
+  }
 
   ngOnInit(): void {
-    this.invoiceSubscription = this.invoiceService.errorOccurred.subscribe(errorMessage => {
-      if (errorMessage) {
-        // Gérez l'erreur ici, par exemple en affichant un message
+    this.invoiceSubscription = this.invoiceService.errorOccurred.subscribe(
+      (errorMessage) => {
+        if (errorMessage) {
+          // Gérez l'erreur ici, par exemple en affichant un message
+        }
       }
-    });
-   // this.loadAllInvoices();
-   // this.loadEntreprises();
-   // this.searchInvoices({});
-   this.loadData();
+    );
+    this.selectedYear; // Par défaut, aucune année n'est sélectionnée
+    this.loadStats();
+    this.loadData();
   }
 
   ngOnDestroy(): void {
@@ -97,31 +127,32 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
   }
 
   loadEntreprises(): void {
-    this.entrepriseService.getEntreprises().subscribe((entreprises) => {
-      this.entreprises = entreprises;
-    }, error => {
-      console.error('Erreur lors du chargement des entreprises :', error);
-    });
+    this.entrepriseService.getEntreprises().subscribe(
+      (entreprises) => {
+        this.entreprises = entreprises;
+      },
+      (error) => {
+        //  console.error('Erreur lors du chargement des entreprises :', error);
+      }
+    );
   }
 
   selectEntreprise(entreprise: Entreprise): void {
     this.selectedEntreprise = entreprise;
-
   }
 
   onEnterpriseSelected() {
     if (this.selectedEntreprise) {
-      console.log('Entreprise sélectionnée :', this.selectedEntreprise);
+      // console.log('Entreprise sélectionnée :', this.selectedEntreprise);
 
       this.entrepriseService.changerEntreprise(this.selectedEntreprise);
-    this.router.navigate(['invoice/formulaire-facture'], { state: { entrepriseId: this.selectedEntreprise } });
-
+      this.router.navigate(['invoice/formulaire-facture'], {
+        state: { entrepriseId: this.selectedEntreprise },
+      });
     } else {
       console.error('Aucune entreprise sélectionnée.');
     }
   }
-
-
 
   searchInvoices(params: any): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -133,7 +164,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
           this.updatePage();
           resolve();
         },
-        error => {
+        (error) => {
           console.error('Failed to load invoices', error);
           this.isLoading = false;
           reject(error);
@@ -148,7 +179,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
       .then(() => {
         this.isLoading = false;
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Failed to load data', error);
         this.isLoading = false;
       });
@@ -173,7 +204,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
   getRowClass: any;
 
   getHeaderClass(column: string): string {
-    switch(column) {
+    switch (column) {
       case 'Réf.':
       case 'Société':
       case 'NC':
@@ -191,26 +222,35 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
         return '';
     }
   }
-  getPaymentModeText(paymentMode: number): string {
+  getPaymentModeText(paymentMode: number, isValidated: number): string {
     switch (paymentMode) {
       case 0:
-        return 'Espèces';
+        return isValidated === 0
+          ? 'Espèces, en attente de validation'
+          : 'Espèces, payée';
       case 1:
-        return 'Chèque';
+        return isValidated === 0
+          ? 'Chèque, en attente de validation'
+          : 'Chèque, payée';
       case 2:
-        return 'Effet';
+        return isValidated === 0
+          ? 'Effet, en attente de validation'
+          : 'Effet, payée';
       case 3:
-        return 'Carte bancaire';
+        return isValidated === 0
+          ? 'Carte bancaire, en attente de validation'
+          : 'Carte bancaire, payée';
       case 4:
-        return 'Virement';
+        return isValidated === 0
+          ? 'Virement, en attente de validation'
+          : 'Virement, payée';
       default:
         return 'Impayé';
     }
   }
 
-
   getColumnWidth(column: string): string {
-    switch(column) {
+    switch (column) {
       case 'Réf.':
         return '85px';
       case 'Date':
@@ -227,7 +267,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
   }
 
   getHeaderLabel(column: string): string {
-    switch(column) {
+    switch (column) {
       case 'Réf.':
         return '#ID';
       case 'Société':
@@ -246,7 +286,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
   }
 
   getHeaderSort(column: string): string {
-    switch(column) {
+    switch (column) {
       case 'Réf.':
         return 'descending';
       case 'Société':
@@ -328,7 +368,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
         this.totalItems = invoices.length;
         this.updatePage();
       },
-      error => {
+      (error) => {
         console.error('Failed to load invoices', error);
       }
     );
@@ -349,49 +389,37 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
     if (this.selectedEntreprise) {
       this.selectedInvoice = null;
       this.isNewInvoice = true;
-      this.router.navigate(['invoice/formulaire-facture'], { state: { entrepriseId: this.selectedEntreprise?.idCompanie } });
+      this.router.navigate(['invoice/formulaire-facture'], {
+        state: { entrepriseId: this.selectedEntreprise?.idCompanie },
+      });
     } else {
       console.error('Aucune entreprise sélectionnée.');
     }
   }
 
   updateInvoice(invoice: Invoice): void {
-    if(this.authService.isAdmin()){
-    this.selectedInvoice = invoice;
-    this.isEditingInvoice = true;
-    }else ('Vous etes pas autorisé')
-
-  }
-
-  deleteInvoice(invoice: Invoice): void {
     if (this.authService.isAdmin()) {
       this.selectedInvoice = invoice;
-    this.isDeletingInvoice = true;
-    }else('Vous etes pas autorisé')
-  
+      this.isEditingInvoice = true;
+    } else 'Vous etes pas autorisé';
   }
 
-  confirmDeleteInvoice(): void {
-    if (this.authService.isAdmin()) {
-          if (this.selectedInvoice) {
-      this.invoiceService.deleteInvoice(this.selectedInvoice.id).subscribe(
+  deleteInvoice(invoiceId: number): void {
+    if (!this.authService.isAdmin()) {
+      this.showError("Vous n'êtes pas autorisé");
+      return;
+    }
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette facture ?')) {
+      this.invoiceService.deleteInvoice(invoiceId).subscribe(
         () => {
-          this.loadAllInvoices();
-          this.cancelDeleteInvoice();
-          this.showSuccess('Invoice deleted successfully!');
+          this.loadData();
+          this.showSuccess('Facture supprimée avec succès!');
         },
         (error) => {
-          this.showError('Failed to delete invoice');
+          this.showError('Échec de la suppression de la facture');
         }
       );
     }
-    }else('Vous etes pas autorisé')
-
-  }
-
-  cancelDeleteInvoice(): void {
-    this.selectedInvoice = null;
-    this.isDeletingInvoice = false;
   }
 
   saveInvoice(invoice: Invoice): void {
@@ -431,7 +459,44 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
       panelClass: ['snackbar-error'],
     });
   }
+  loadStats(): void {
+    if (this.selectedYear) {
+      this.loadInvoiceStats(this.selectedYear);
+      this.loadClientInvoiceStats(this.selectedYear);
+    } else {
+      this.loadInvoiceStats();
+      this.loadClientInvoiceStats();
+    }
+  }
+  loadInvoiceStats(year?: number): void {
+    this.invoiceService.getInvoiceStats(year).subscribe(
+      (data) => {
+        this.creanceCount = data.creanceCount;
+        this.pendingValidationCount = data.pendingValidationCount;
+        this.paidValidatedCount = data.paidValidatedCount;
+      },
+      (error) => {
+        this.errorMessage =
+          'Erreur lors du chargement des statistiques des factures';
+        // console.error('Error loading invoice stats:', error);
+      }
+    );
+  }
 
+  loadClientInvoiceStats(year?: number): void {
+    this.invoiceService.getClientInvoiceStats(year).subscribe(
+      (data) => {
+        this.registeredClientCount = data.registeredClientCount;
+        this.unregisteredClientCount = data.unregisteredClientCount;
+        this.totalClientCount = data.totalClientCount;
+      },
+      (error) => {
+        this.errorMessage =
+          'Erreur lors du chargement des statistiques des clients';
+        console.error('Error loading client invoice stats:', error);
+      }
+    );
+  }
   search(): void {
     // Implémentez la logique de recherche ici
   }
@@ -448,7 +513,7 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
         return invoice.date.toLocaleDateString();
       case 'Nbr articles':
         let totalQuantity = 0;
-        invoice.items.forEach(item => {
+        invoice.items.forEach((item) => {
           totalQuantity += item.quantity;
         });
         return totalQuantity;
@@ -465,22 +530,91 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
     }
   }
 
-  getInvoicesByType(type: string): Invoice[] {
-    return this.invoices.filter(invoice => invoice.type === type);
+  getInvoicesByType(type: number): Invoice[] {
+    return this.invoices.filter((invoice) => invoice.type === type);
   }
 
+
+  validerFacture(idInv: number): void {
+    if (this.authService.isAdmin()) {
+      const dialogRef = this.dialog.open(PaymentModalComponent, {
+        width: '400px',
+        data: {}
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          const { paymentDate, paymentMode, paymentComment } = result;
+          this.invoiceService.validateInvoice2(idInv, paymentDate, paymentMode, paymentComment).subscribe({
+            next: (response) => {
+              const invoice = this.invoices.find((inv: Invoice) => inv.idInv === idInv);
+              if (invoice) {
+                invoice.isValidated = 1;
+              }
+              this.dialog.open(DialogComponent, {
+                data: { message: 'Facture Mise à jour avec succès' }
+              });
+            //  window.location.reload();
+              this.router.navigate(['/invoice/preview-facture', idInv]);
+            },
+            error: (error) => {
+              console.error('Erreur lors de la validation de la facture', error);
+              this.dialog.open(DialogComponent, {
+                data: { message: 'Erreur lors de la modification de la facture' }
+              });
+            }
+          });
+        }
+      });
+    } else {
+      alert('Vous n\'êtes pas autorisé');
+    }
+  }
+  
+  validerEnAttente(idInv: number): void {
+    const dialogRef = this.dialog.open(PaymentModalComponent, {
+      width: '400px',
+      data: {}
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const { paymentDate, paymentMode, paymentComment} = result;
+        this.invoiceService.validateInvoiceAttente2(idInv, paymentDate, paymentMode, paymentComment).subscribe({
+          next: (response) => {
+            const invoice = this.invoices.find((inv: Invoice) => inv.idInv === idInv);
+            if (invoice) {
+              invoice.etat = 1;
+            }
+            this.dialog.open(DialogComponent, {
+              data: { message: 'Facture Mise à jour avec succès' }
+            });
+           // window.location.reload();
+            this.router.navigate(['/invoice/preview-facture', idInv]);
+          },
+          error: (error) => {
+            console.error('Erreur lors de la validation de la facture', error);
+            this.dialog.open(DialogComponent, {
+              data: { message: 'Erreur lors de la modification de la facture' }
+            });
+          }
+        });
+      }
+    });
+  }
+  
   toggleSelectInvoice(invoice: Invoice): void {
     this.selectedInvoices[invoice.id] = !this.selectedInvoices[invoice.id];
   }
 
-  selectAllInvoices(type: string): void {
-    this.getInvoicesByType(type).forEach(invoice => {
+  selectAllInvoices(type: number): void {
+    this.getInvoicesByType(type).forEach((invoice) => {
       this.selectedInvoices[invoice.id] = true;
     });
   }
 
-  deselectAllInvoices(type: string): void {
-    this.getInvoicesByType(type).forEach(invoice => {
+  deselectAllInvoices(type: number): void {
+    this.getInvoicesByType(type).forEach((invoice) => {
       this.selectedInvoices[invoice.id] = false;
     });
   }
@@ -490,7 +624,9 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
       .filter(([id, selected]) => selected)
       .map(([id, selected]) => id.toString());
 
-    const selectedInvoices = this.invoices.filter(invoice => selectedIds.includes(invoice.id.toString()));
+    const selectedInvoices = this.invoices.filter((invoice) =>
+      selectedIds.includes(invoice.id.toString())
+    );
     // Logique pour exporter les factures sélectionnées vers Excel
   }
 
@@ -499,7 +635,9 @@ export class AppInvoiceComponent implements OnInit, OnDestroy {
       .filter(([id, selected]) => selected)
       .map(([id, selected]) => id.toString());
 
-    const selectedInvoices = this.invoices.filter(invoice => selectedIds.includes(invoice.id.toString()));
+    const selectedInvoices = this.invoices.filter((invoice) =>
+      selectedIds.includes(invoice.id.toString())
+    );
     // Logique pour exporter les factures sélectionnées vers PDF
   }
 

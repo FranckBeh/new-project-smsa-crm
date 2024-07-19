@@ -1,0 +1,205 @@
+<div class="container mt-4">
+  <a routerLink="/prestataires" class="btn btn-outline-primary mb-3" style="color: #dcc36b; border-color: #dcc36b;">
+    <i class="fa fa-arrow-left"></i> Retour
+  </a>
+  <form [formGroup]="prestataireForm" (ngSubmit)="onSubmit()">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white text-uppercase">
+        <i class="fas fa-building"></i> Éditer Prestataire
+      </div>
+      <div class="card-body bg-light">
+        <div class="row mb-4">
+          <div class="col-md-3 text-center">
+            <img src="placeholder.jpg" class="img-thumbnail mb-2" alt="Prestataire Image" style="width: 100%;">
+            <input type="file" (change)="onFileSelected($event, 'photo')" class="form-control mb-2" />
+          </div>
+          <div class="col-md-9">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="nom" class="form-label">Prestataire <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" formControlName="nom" required>
+                <div *ngIf="prestataireForm.get('nom')?.invalid && prestataireForm.get('nom')?.touched" class="text-danger">
+                  Nom est requis.
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="ville" class="form-label">Ville <span class="text-danger">*</span></label>
+                <mat-form-field appearance="fill" class="w-100">
+                  <mat-select formControlName="ville" required>
+                    <mat-option *ngFor="let ville of villes" [value]="ville.NumVille">{{ ville.NomVille }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="telephone" class="form-label">Téléphone <span class="text-danger">*</span></label>
+                <input type="tel" class="form-control" formControlName="telephone" required>
+                <div *ngIf="prestataireForm.get('telephone')?.invalid && prestataireForm.get('telephone')?.touched" class="text-danger">
+                  Téléphone est requis.
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="fax" class="form-label">Fax</label>
+                <input type="tel" class="form-control" formControlName="fax">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" formControlName="email">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="adresse" class="form-label">Adresse</label>
+                <input type="text" class="form-control" formControlName="adresse">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card bg-light p-3">
+              <h6 class="text-dark text-uppercase"><i class="fas fa-user"></i> Détails du Responsable</h6>
+              <div class="mb-3">
+                <label for="nomResponsable" class="form-label">Nom Resp. <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" formControlName="nomResponsable" required>
+                <div *ngIf="prestataireForm.get('nomResponsable')?.invalid && prestataireForm.get('nomResponsable')?.touched" class="text-danger">
+                  Nom du responsable est requis.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="fonctionResponsable" class="form-label">Fonction</label>
+                <input type="text" class="form-control" formControlName="fonctionResponsable">
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="gsmResponsable" class="form-label">GSM Resp. <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control" formControlName="gsmResponsable" required>
+                  <div *ngIf="prestataireForm.get('gsmResponsable')?.invalid && prestataireForm.get('gsmResponsable')?.touched" class="text-danger">
+                    GSM du responsable est requis.
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="emailResponsable" class="form-label">Email</label>
+                  <input type="email" class="form-control" formControlName="emailResponsable">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card bg-light p-3">
+              <h6 class="text-dark text-uppercase"><i class="fas fa-comment-dots"></i> Remarques</h6>
+              <textarea class="form-control" rows="6" formControlName="remarques"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="card bg-light p-3">
+              <h6 class="text-dark text-uppercase"><i class="fas fa-list-alt"></i> Domaines d'activité</h6>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <input type="text" class="form-control" placeholder="Entrez les différents domaines d'activité" formControlName="domaineActivite">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <mat-form-field appearance="fill" class="w-100">
+                    <mat-select formControlName="selectedDomaines" multiple>
+                      <mat-option *ngFor="let domaine of domaines" [value]="domaine.IdDomaine">{{ domaine.nom }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="card bg-light p-3">
+              <h6 class="text-dark text-uppercase"><i class="fas fa-tags"></i> Mots Clés</h6>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <input type="text" class="form-control" placeholder="Entrez les différents mots clés" formControlName="motsCles">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <mat-form-field appearance="fill" class="w-100">
+                    <mat-select formControlName="selectedTags" multiple>
+                      <mat-option *ngFor="let tag of tags" [value]="tag.idTag">{{ tag.nom }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          
+            <div class="col-md-6">
+              <div class="card bg-light p-3">
+                <h6 class="text-dark text-uppercase">
+                  <i class="fas fa-info-circle"></i> Informations Supplémentaires
+                </h6>
+                <div formArrayName="infosSupplementaires">
+                  <div *ngFor="let info of infosSupplementaires.controls; let i = index" [formGroupName]="i">
+                    <div class="input-group mb-2">
+                      <input type="text" class="form-control" placeholder="Libelle" formControlName="libelle">
+                      <input type="text" class="form-control" placeholder="Information" formControlName="information">
+                      <button type="button" class="btn btn-danger" (click)="removeInfo(i)">
+                        <i class="fas fa-minus-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary" (click)="addInfo()">
+                  <i class="fas fa-plus-circle"></i> Ajouter une ligne
+                </button>
+              </div>
+            </div>
+          <div class="col-md-6">
+            <div class="card bg-light p-3">
+              <h6 class="text-dark text-uppercase"><i class="fas fa-file-alt"></i> Documents</h6>
+              <input type="file" (change)="onFileSelected($event, 'documents')" multiple class="form-control mb-2" />
+              <ul class="list-group">
+                <li *ngFor="let file of selectedFiles" class="list-group-item">
+                  {{ file.name }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="card bg-light p-3">
+              <h6 class="text-dark text-uppercase"><i class="fas fa-check-circle"></i> Validité du Prestataire</h6>
+              <mat-slide-toggle formControlName="validite">Valide</mat-slide-toggle>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card bg-light p-3">
+              <h6 class="text-dark text-uppercase"><i class="fas fa-star"></i> Avis</h6>
+              <textarea class="form-control" rows="4" formControlName="avis"></textarea>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card bg-light p-3">
+              <h6 class="text-dark text-uppercase"><i class="fas fa-globe"></i> Internet</h6>
+              <input type="text" class="form-control" formControlName="internet">
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-secondary" (click)="onClearForm()">Réinitialiser</button>
+          <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

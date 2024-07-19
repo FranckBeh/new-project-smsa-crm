@@ -3,7 +3,7 @@ const sequelize = require('../../config/database.js');
 
 class Listinvcmt extends Model {}
 
-cListinvcmt.init( {
+Listinvcmt.init( {
   idCommentaire: {
     type: DataTypes.INTEGER,
     allowNull: false,

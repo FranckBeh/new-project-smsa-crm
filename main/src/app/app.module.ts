@@ -27,6 +27,7 @@ import { BrandingComponent } from './layouts/full/sidebar/branding.component';
 import { AppNavItemComponent } from './layouts/full/sidebar/nav-item/nav-item.component';
 import { LogoutDialogComponent } from './layouts/full/header/logoutDialog.component';
 import {DialogComponent} from './layouts/dialog/dialog.component';
+import { AuthService } from './pages/auth/auth.service';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import {DialogComponent} from './layouts/dialog/dialog.component';
   exports: [TablerIconsModule],
   providers: [
     // vos autres providers ici
+    AuthService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
